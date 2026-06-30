@@ -81,6 +81,37 @@
         let refreshInterval = null;
         let myPeerId = null;
         let isConnecting = {};
+        let pendingSignals = {};
+        let failedPeers = {};
+
+        function sanitizeSDP(sdp) {
+            if (!sdp || typeof sdp !== 'string') {
+                return sdp;
+            }
+
+            const cleaned = sdp
+                .replace(/\r\n/g, '\n')
+                .split('\n')
+                .filter(function(line) {
+                    return line.length > 0;
+                })
+                .join('\r\n');
+
+            return cleaned.endsWith('\r\n') ? cleaned : cleaned + '\r\n';
+        }
+
+        function sanitizeSignal(signalData) {
+            if (!signalData || typeof signalData !== 'object') {
+                return signalData;
+            }
+
+            const cleanedSignal = Object.assign({}, signalData);
+            if (typeof cleanedSignal.sdp === 'string') {
+                cleanedSignal.sdp = sanitizeSDP(cleanedSignal.sdp);
+            }
+
+            return cleanedSignal;
+        }
 
         // ============================================================
         // CAMERA
@@ -89,7 +120,7 @@
             if (localStream) return;
 
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                alert('Camera not available. Please use http://127.0.0.1 or HTTPS.');
+                alert('Camera requires HTTPS on this network. Open https://192.168.1.41:8443 instead of http.');
                 return;
             }
 
@@ -101,9 +132,6 @@
                     localStream = stream;
                     addVideo('local', stream, true);
                     console.log('✅ Camera started successfully');
-
-                    // FIX 1: Only generate your ID and start listening AFTER the camera is fully running
-                    generatePeerId();
                 })
                 .catch(function(err) {
                     console.error('❌ Camera error:', err);
@@ -118,7 +146,7 @@
             myPeerId = 'user-' + authUserId + '-' + Date.now();
             console.log('🆔 MY PEER ID:', myPeerId);
 
-            fetch('/save-peer-id', {
+            return fetch('/save-peer-id', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -128,20 +156,29 @@
                         peer_id: myPeerId
                     })
                 })
-                .then(() => {
+                .then(function() {
                     console.log('✅ Peer ID saved to server');
                     getParticipants();
                     initEchoListeners();
                     startAutoRefresh();
-                    startSignalPolling(); // FIX 1: Safe to poll for signals now
+                    startSignalPolling();
                 })
-                .catch(err => console.error('Error saving peer ID:', err));
+                .catch(function(err) {
+                    console.error('Error saving peer ID:', err);
+                });
         }
 
         // ============================================================
         // CREATE PEER CONNECTION
         // ============================================================
         function createPeerConnection(peerId, isInitiator) {
+            if (!localStream) {
+                setTimeout(function() {
+                    createPeerConnection(peerId, isInitiator);
+                }, 500);
+                return;
+            }
+
             if (peers[peerId]) {
                 console.log('⏭️ Already connected to:', peerId);
                 return;
@@ -156,8 +193,9 @@
 
             const peer = new SimplePeer({
                 initiator: isInitiator,
-                stream: localStream, // Now guaranteed to be populated!
+                stream: localStream,
                 trickle: false,
+                sdpTransform: sanitizeSDP,
                 config: {
                     iceServers: [{
                             urls: 'stun:stun.l.google.com:19302'
@@ -179,7 +217,12 @@
 
             peer.on('stream', function(stream) {
                 console.log('✅ REMOTE STREAM RECEIVED from:', peerId);
+                delete failedPeers[peerId];
                 addVideo(peerId, stream, false);
+                isConnecting[peerId] = false;
+            });
+
+            peer.on('connect', function() {
                 isConnecting[peerId] = false;
             });
 
@@ -193,15 +236,38 @@
             peer.on('error', function(err) {
                 console.error('❌ Peer connection error:', err);
                 isConnecting[peerId] = false;
+                failedPeers[peerId] = Date.now();
+                try {
+                    peer.destroy();
+                } catch (e) {}
+                delete peers[peerId];
             });
 
             peers[peerId] = peer;
+
+            if (pendingSignals[peerId] && pendingSignals[peerId].length) {
+                setTimeout(function() {
+                    if (!peers[peerId]) return;
+
+                    pendingSignals[peerId].forEach(function(signal) {
+                        try {
+                            peers[peerId].signal(signal);
+                        } catch (e) {
+                            console.error('❌ Deferred signal failed for:', peerId, e);
+                        }
+                    });
+
+                    delete pendingSignals[peerId];
+                }, 0);
+            }
         }
 
         // ============================================================
         // SEND SIGNAL
         // ============================================================
         function sendSignal(peerId, signalData) {
+            const cleanSignal = sanitizeSignal(signalData);
+
             fetch('/meeting/signal', {
                     method: 'POST',
                     headers: {
@@ -212,7 +278,7 @@
                         meeting_id: meetingId,
                         peer_id: myPeerId,
                         target_peer_id: peerId,
-                        signal: signalData
+                        signal: cleanSignal
                     })
                 })
                 .then(res => res.json())
@@ -238,16 +304,20 @@
                 } catch (e) {}
             }
 
-            if (peers[fromPeerId]) {
-                peers[fromPeerId].signal(parsedSignal);
-            } else {
+            parsedSignal = sanitizeSignal(parsedSignal);
+
+            if (!peers[fromPeerId]) {
                 console.log('📡 Creating non-initiating receiving peer container for:', fromPeerId);
-                createPeerConnection(fromPeerId, false); // Force receiver mode
-                setTimeout(() => {
-                    if (peers[fromPeerId]) {
-                        peers[fromPeerId].signal(parsedSignal);
-                    }
-                }, 300);
+                pendingSignals[fromPeerId] = pendingSignals[fromPeerId] || [];
+                pendingSignals[fromPeerId].push(parsedSignal);
+                createPeerConnection(fromPeerId, false);
+                return;
+            }
+
+            try {
+                peers[fromPeerId].signal(parsedSignal);
+            } catch (e) {
+                console.error('❌ Signal failed for:', fromPeerId, e);
             }
         }
 
@@ -293,9 +363,11 @@
                     // Connect to new participants systematically
                     data.forEach(function(p) {
                         if (p.user_id != authUserId && p.peer_id && !peers[p.peer_id] && !isConnecting[p.peer_id]) {
+                            const failedAt = failedPeers[p.peer_id];
+                            if (failedAt && (Date.now() - failedAt) < 15000) {
+                                return;
+                            }
 
-                            // FIX 2: Deterministic initiation role. 
-                            // String comparison forces only one participant to make the call.
                             const shouldIInitiate = myPeerId > p.peer_id;
 
                             if (shouldIInitiate) {
@@ -336,7 +408,7 @@
 
             const video = document.createElement('video');
             video.autoplay = true;
-            video.playsinline = true;
+            video.playsInline = true;
             video.muted = isLocal; // Never loop local microphone output back to yourself
             video.srcObject = stream;
 
@@ -347,6 +419,8 @@
             div.appendChild(video);
             div.appendChild(label);
             grid.appendChild(div);
+
+            video.play().catch(function() {});
 
             videoElements[peerId] = div;
 
@@ -398,14 +472,6 @@
 
                     participantNames[p.peer_id] = p.user_name;
                     console.log('👤 Push Notification: Participant entered:', p.user_name);
-
-                    // FIX 2: Apply the same asymmetric check to Echo instant call routing
-                    const shouldIInitiate = myPeerId > p.peer_id;
-                    if (shouldIInitiate && !peers[p.peer_id] && !isConnecting[p.peer_id]) {
-                        setTimeout(function() {
-                            createPeerConnection(p.peer_id, true);
-                        }, 1500);
-                    }
                 })
                 .listen('MeetingEnded', function() {
                     endMeetingForAll('Meeting ended by host');
@@ -535,7 +601,8 @@
             const endBtn = document.getElementById('endMeetingBtn');
             if (endBtn) endBtn.addEventListener('click', endMeeting);
 
-            // Kickoff: Get media permissions first. Signaling automatically cascades from here.
+            // Save peer ID immediately so signaling works, start camera in parallel
+            generatePeerId();
             startCamera();
         });
 

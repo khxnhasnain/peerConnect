@@ -46,11 +46,15 @@ class MeetingController extends Controller
 
     private function joinMeeting($meetingId, $peerId)
     {
-        $participant = MeetingParticipant::create([
-            'meeting_id' => $meetingId,
-            'user_id'    => Auth::id(),
-            'peer_id'    => $peerId,
-        ]);
+        $participant = MeetingParticipant::updateOrCreate(
+            [
+                'meeting_id' => $meetingId,
+                'user_id'    => Auth::id(),
+            ],
+            [
+                'peer_id' => $peerId,
+            ]
+        );
 
         broadcast(new ParticipantJoined($participant))->toOthers();
 
@@ -66,7 +70,7 @@ class MeetingController extends Controller
                 return [
                     'user_id' => $p->user_id,
                     'user_name' => $p->user ? $p->user->name : 'Unknown',
-                    'peer_id' => $p->peer_id,
+                    'peer_id' => $p->peer_id ?: ($p->user ? $p->user->peer_id : null),
                     'is_audio_muted' => $p->is_audio_muted ?? false,
                     'is_video_off' => $p->is_video_off ?? false,
                 ];

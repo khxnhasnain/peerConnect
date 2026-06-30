@@ -14,6 +14,25 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+if (app()->environment('local')) {
+    Route::get('/dev/trust-cert', function () {
+        return view('trust-cert');
+    })->name('dev.trust-cert');
+
+    Route::get('/dev/rootCA.pem', function () {
+        $caRoot = trim((string) shell_exec('mkcert -CAROOT 2>/dev/null'));
+        $caPath = $caRoot.'/rootCA.pem';
+
+        if ($caRoot === '' || ! is_file($caPath)) {
+            abort(404, 'mkcert root CA not found. Run: mkcert -install');
+        }
+
+        return response()->download($caPath, 'rootCA.pem', [
+            'Content-Type' => 'application/x-pem-file',
+        ]);
+    })->name('dev.root-ca');
+}
+
 Route::get('/dashboard', function () {
     $users = User::where('id', '!=', Auth::id())->get();
     return view('dashboard', compact('users'));

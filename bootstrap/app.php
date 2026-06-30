@@ -12,6 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         // CORS handled by config/cors.php
+        $middleware->trimStrings(except: [
+            'signal.sdp',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

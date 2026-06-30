@@ -32,7 +32,7 @@ class ParticipantJoined implements ShouldBroadcast
                 'id'         => $this->participant->id,
                 'user_id'    => $this->participant->user_id,
                 'user_name'  => $this->participant->user->name,
-                'peer_id'    => $this->participant->peer_id,
+                'peer_id'    => $this->participant->user ? $this->participant->user->peer_id : $this->participant->peer_id,
             ]
         ];
     }
