@@ -15,11 +15,15 @@ class MeetingParticipant extends Model
         'peer_id',
         'is_audio_muted',
         'is_video_off',
+        'hand_raised',
+        'is_admin',
     ];
 
     protected $casts = [
         'is_audio_muted' => 'boolean',
         'is_video_off' => 'boolean',
+        'hand_raised' => 'boolean',
+        'is_admin' => 'boolean',
     ];
 
     public function meeting()

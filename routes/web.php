@@ -9,61 +9,74 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
+use App\Http\Controllers\GoogleAuthController;
 
+// ============================================================
+// PUBLIC & GUEST ROUTES
+// ============================================================
 Route::get('/', function () {
     return view('welcome');
 });
 
-if (app()->environment('local')) {
-    Route::get('/dev/trust-cert', function () {
-        return view('trust-cert');
-    })->name('dev.trust-cert');
+Route::get('auth/google', [GoogleAuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 
-    Route::get('/dev/rootCA.pem', function () {
-        $caRoot = trim((string) shell_exec('mkcert -CAROOT 2>/dev/null'));
-        $caPath = $caRoot.'/rootCA.pem';
-
-        if ($caRoot === '' || ! is_file($caPath)) {
-            abort(404, 'mkcert root CA not found. Run: mkcert -install');
-        }
-
-        return response()->download($caPath, 'rootCA.pem', [
-            'Content-Type' => 'application/x-pem-file',
-        ]);
-    })->name('dev.root-ca');
-}
-
+// ============================================================
+// CORE DASHBOARD (VERIFIED USERS)
+// ============================================================
 Route::get('/dashboard', function () {
     $users = User::where('id', '!=', Auth::id())->get();
     return view('dashboard', compact('users'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+// ============================================================
+// AUTHENTICATED APPLICATION ENGINE
+// ============================================================
 Route::middleware('auth')->group(function () {
+
+    // Realtime Websocket Channels Auth
     Broadcast::routes();
 
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    // User Profile Layer
+    Route::controller(ProfileController::class)->group(function () {
+        Route::get('/profile', 'edit')->name('profile.edit');
+        Route::patch('/profile', 'update')->name('profile.update');
+        Route::delete('/profile', 'destroy')->name('profile.destroy');
+    });
 
-    Route::post('/save-peer-id', [PeerController::class, 'save']);
+    // Global Peer Tracking Engine
+    Route::post('/save-peer-id', [PeerController::class, 'save'])->name('peer.save');
 
-    Route::get('/messages/{userId}', [ChatController::class, 'getMessages']);
-    Route::post('/messages', [ChatController::class, 'sendMessage']);
-    Route::post('/messages/read/{userId}', [ChatController::class, 'markAsRead']);
+    // Chat Management Layer
+    Route::controller(ChatController::class)->group(function () {
+        Route::get('/messages/{userId}', 'getMessages')->name('chat.messages');
+        Route::post('/messages', 'sendMessage')->name('chat.send');
+        Route::post('/messages/read/{userId}', 'markAsRead')->name('chat.read');
+    });
 
-    // MEETING ROUTES
-    Route::get('/meeting/create', [MeetingController::class, 'create'])->name('meeting.create');
-    Route::get('/meeting/{roomId}', [MeetingController::class, 'join'])->name('meeting.join');
-    Route::get('/meeting/participants/{meetingId}', [MeetingController::class, 'getParticipants']);
-    Route::post('/meeting/leave', [MeetingController::class, 'leave']);
-    Route::post('/meeting/end/{meetingId}', [MeetingController::class, 'endMeeting']);
-    Route::post('/meeting/toggle-audio/{meetingId}/{userId}', [MeetingController::class, 'toggleAudio']);
-    Route::post('/meeting/toggle-video/{meetingId}/{userId}', [MeetingController::class, 'toggleVideo']);
-    Route::post('/meeting/kick/{meetingId}/{userId}', [MeetingController::class, 'kickParticipant']);
-    Route::post('/meeting/update-status/{meetingId}', [MeetingController::class, 'updateStatus']);
-    Route::post('/meeting/signal', [MeetingController::class, 'sendSignal']);
-    Route::get('/meeting/signals/{meetingId}/{peerId}', [MeetingController::class, 'getSignals']);
+    // Cleaned & Grouped Video Meeting Architecture
+    Route::prefix('meeting')->controller(MeetingController::class)->group(function () {
+        Route::get('/create', 'create')->name('meeting.create');
+        Route::get('/participants/{meetingId}', 'getParticipants')->name('meeting.participants');
+        Route::get('/chat/{meetingId}', 'getChatMessages')->name('meeting.chat.messages');
+        Route::get('/signals/{meetingId}/{peerId}', 'getSignals')->name('meeting.get-signals');
+        Route::post('/leave', 'leave')->name('meeting.leave');
+        Route::post('/end/{meetingId}', 'endMeeting')->name('meeting.end');
+        Route::post('/update-status/{meetingId}', 'updateStatus')->name('meeting.update-status');
+        Route::post('/signal', 'sendSignal')->name('meeting.signal');
 
+        // Host Moderation Handlers
+        Route::post('/toggle-audio/{meetingId}/{userId}', 'toggleAudio')->name('meeting.remote-mute');
+        Route::post('/toggle-video/{meetingId}/{userId}', 'toggleVideo')->name('meeting.remote-camera');
+        Route::post('/kick/{meetingId}/{userId}', 'kickParticipant')->name('meeting.kick');
+        Route::post('/make-admin/{meetingId}/{userId}', 'makeAdmin')->name('meeting.make-admin');
+        Route::post('/raise-hand-event', 'raiseHand')->name('meeting.raise-hand-event');
+        Route::post('/chat/broadcast', 'broadcastChat')->name('meeting.chat.broadcast');
+        Route::get('/sync/{meetingId}/{peerId}', 'syncMeeting')->name('meeting.sync');
+        Route::get('/{roomId}', 'join')->name('meeting.join');
+    });
+
+    // Presence / Lifecycle Toggles
     Route::post('/set-offline', function () {
         if (Auth::check()) {
             DB::table('users')
@@ -71,11 +84,19 @@ Route::middleware('auth')->group(function () {
                 ->update(['is_online' => false]);
         }
         return response()->json(['success' => true]);
-    });
+    })->name('user.set-offline');
 });
 
+// ============================================================
+// HAND RAISE ROUTES
+// ============================================================
+Route::post('/meeting/raise-hand', [MeetingController::class, 'raiseHand'])->middleware('auth')->name('meeting.raise-hand');
+
+// ============================================================
+// DEVELOPMENT / TESTING SANDBOX
+// ============================================================
 Route::get('/peer-test', function () {
     return view('peer-test');
-})->middleware('auth');
+})->middleware('auth')->name('peer.test');
 
 require __DIR__ . '/auth.php';

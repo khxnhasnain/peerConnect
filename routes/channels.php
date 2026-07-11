@@ -1,13 +1,20 @@
 <?php
 
 use Illuminate\Support\Facades\Broadcast;
+use App\Models\MeetingParticipant;
 
-Broadcast::channel('user.{id}', function ($user, $id) {
-    return (int) $user->id === (int) $id;
-});
-
+// Channel authorization for hand raise events
 Broadcast::channel('meeting.{meetingId}', function ($user, $meetingId) {
-    return \App\Models\MeetingParticipant::where('meeting_id', $meetingId)
+    // Check if user is a participant in this meeting
+    $participant = MeetingParticipant::where('meeting_id', $meetingId)
         ->where('user_id', $user->id)
         ->exists();
+
+    \Illuminate\Support\Facades\Log::info('Channel auth:', [
+        'user_id' => $user->id,
+        'meeting_id' => $meetingId,
+        'participant' => $participant
+    ]);
+
+    return $participant;
 });

@@ -7,11 +7,20 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 // Add this ↓
 window.Pusher = Pusher;
+
+const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
 window.Echo = new Echo({
     broadcaster: 'pusher',
     key: import.meta.env.VITE_PUSHER_APP_KEY || '7f08a724509d8dee9edf',
     cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER || 'ap2',
     forceTLS: true,
+    authEndpoint: '/broadcasting/auth',
+    auth: {
+        headers: {
+            'X-CSRF-TOKEN': csrfToken || '',
+        },
+    },
 });
 
 console.log('✅ Echo ready');
