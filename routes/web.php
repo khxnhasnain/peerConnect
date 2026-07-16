@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Http\Controllers\GoogleAuthController;
+use App\Http\Controllers\RecordingController;
 
 // ============================================================
 // PUBLIC & GUEST ROUTES
@@ -74,6 +75,18 @@ Route::middleware('auth')->group(function () {
         Route::post('/chat/broadcast', 'broadcastChat')->name('meeting.chat.broadcast');
         Route::get('/sync/{meetingId}/{peerId}', 'syncMeeting')->name('meeting.sync');
         Route::get('/{roomId}', 'join')->name('meeting.join');
+    });
+
+    // Recording Management Layer
+    Route::controller(RecordingController::class)->group(function () {
+        Route::get('/recordings', 'index')->name('recordings.index');
+        Route::get('/recordings/sync-requests', 'syncRequests')->name('recordings.sync-requests');
+        Route::post('/meeting/recording/upload', 'upload')->name('recording.upload');
+        Route::get('/recordings/{id}/play', 'play')->name('recordings.play');
+        Route::get('/recordings/{id}/download', 'download')->name('recordings.download');
+        Route::post('/recordings/{id}/request-download', 'requestDownload')->name('recordings.request-download');
+        Route::post('/recordings/download-requests/{requestId}/action', 'handleRequest')->name('recordings.handle-request');
+        Route::delete('/recordings/{id}', 'destroy')->name('recordings.destroy');
     });
 
     // Presence / Lifecycle Toggles

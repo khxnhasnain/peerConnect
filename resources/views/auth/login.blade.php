@@ -27,7 +27,7 @@
         <!-- Remember Me -->
         <div class="block mt-4">
             <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded bg-[#111c31] border-slate-700 text-blue-500 shadow-sm focus:ring-blue-500" name="remember">
+                <input id="remember_me" type="checkbox" class="rounded bg-slate-950 border-slate-800 text-indigo-500 shadow-sm focus:ring-indigo-600" name="remember">
                 <span class="ms-2 text-sm text-slate-400">{{ __('Remember me') }}</span>
             </label>
         </div>
@@ -35,17 +35,17 @@
         <!-- OR Divider -->
         <div class="relative my-6">
             <div class="absolute inset-0 flex items-center">
-                <div class="w-full border-t border-slate-700"></div>
+                <div class="w-full border-t border-slate-800"></div>
             </div>
             <div class="relative flex justify-center text-sm">
-                <span class="px-2 bg-[#0f172a] text-slate-400">Or</span>
+                <span class="px-2 bg-slate-900 text-slate-400">Or</span>
             </div>
         </div>
 
         <!-- Google Login Button (BOTTOM) -->
         <div>
             <a href="{{ route('auth.google') }}"
-                class="w-full flex items-center justify-center gap-3 bg-[#111c31] hover:bg-[#14233d] text-slate-100 font-semibold py-3 px-4 rounded-lg border border-slate-700 transition duration-200">
+                class="w-full flex items-center justify-center gap-3 bg-slate-950 hover:bg-slate-800 text-slate-100 font-semibold py-3 px-4 rounded-lg border border-slate-800 transition duration-200">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
                     <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
@@ -58,7 +58,7 @@
 
         <div class="flex items-center justify-end mt-4">
             @if (Route::has('password.request'))
-            <a class="underline text-sm text-slate-400 hover:text-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 focus:ring-offset-[#06111f]" href="{{ route('password.request') }}">
+            <a class="underline text-sm text-slate-400 hover:text-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 focus:ring-offset-slate-950" href="{{ route('password.request') }}">
                 {{ __('Forgot your password?') }}
             </a>
             @endif
@@ -75,7 +75,7 @@
     <div class="mt-6 text-center">
         <p class="text-sm text-slate-400">
             Don't have an account?
-            <a href="{{ route('register') }}" class="text-blue-400 hover:text-blue-300 font-semibold">
+            <a href="{{ route('register') }}" class="text-indigo-400 hover:text-indigo-300 font-semibold">
                 Register
             </a>
         </p>

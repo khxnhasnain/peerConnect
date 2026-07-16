@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -31,7 +31,7 @@ class MeetingChatMessage implements ShouldBroadcastNow
 
     public function broadcastOn()
     {
-        return new Channel('meeting.' . $this->meetingId);
+        return new PrivateChannel('meeting.' . $this->meetingId);
     }
 
     public function broadcastAs()

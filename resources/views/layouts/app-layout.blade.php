@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
@@ -9,8 +9,8 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-sans antialiased bg-[#06111f] text-slate-100">
-    <div class="min-h-screen bg-[#06111f] text-slate-100">
+<body class="font-sans antialiased bg-slate-950 text-slate-100">
+    <div class="min-h-screen bg-slate-950 text-slate-100">
         <!-- ============================================================
         REMOVED TOP NAVIGATION BAR
         ============================================================ -->

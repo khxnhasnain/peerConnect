@@ -160,8 +160,12 @@ class MeetingController extends Controller
     public function getSignals($meetingId, $peerId)
     {
         try {
+            $userId = Auth::id();
             $signals = Signal::where('meeting_id', $meetingId)
-                ->where('to_peer_id', $peerId)
+                ->where(function ($query) use ($peerId, $userId) {
+                    $query->where('to_peer_id', $peerId)
+                        ->orWhere('to_peer_id', 'like', 'user-' . $userId . '-%');
+                })
                 ->where('processed', false)
                 ->get();
 
@@ -412,7 +416,10 @@ class MeetingController extends Controller
 
         // 1. Get signals for peer
         $signals = Signal::where('meeting_id', $meetingId)
-            ->where('to_peer_id', $peerId)
+            ->where(function ($query) use ($peerId, $userId) {
+                $query->where('to_peer_id', $peerId)
+                    ->orWhere('to_peer_id', 'like', 'user-' . $userId . '-%');
+            })
             ->where('processed', false)
             ->get();
 

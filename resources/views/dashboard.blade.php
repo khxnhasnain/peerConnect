@@ -4,61 +4,32 @@
     <input type="hidden" id="csrfToken" value="{{ csrf_token() }}">
     <input type="hidden" id="userName" value="{{ Auth::user()->name }}">
 
-    <div class="h-screen bg-[#06111f] flex text-slate-100">
+    <div class="h-screen bg-slate-950 flex text-slate-100">
         <!-- ============================================================
         LEFT SIDEBAR
         ============================================================ -->
-        <div class="w-80 bg-[#0b1220] text-white flex flex-col flex-shrink-0 border-r border-slate-800">
+        <div class="w-80 bg-slate-900 text-white flex flex-col flex-shrink-0 border-r border-slate-800">
 
             <!-- BRAND -->
             <div class="p-6 border-b border-slate-800">
-                <h1 class="text-2xl font-bold text-blue-400">PeerConnect</h1>
-                <p class="text-slate-400 text-sm">Video Meetings & Chat</p>
-            </div>
-
-            <!-- SEARCH FRIENDS -->
-            <div class="px-4 pb-4 pt-4">
-                <input type="text" placeholder="Search friends..." id="searchUsers" class="w-full rounded-lg bg-[#111c31] border border-slate-700 text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-
-            <!-- FRIENDS LIST -->
-            <div class="flex-1 overflow-y-auto">
-                <div class="px-4 text-xs text-slate-400 uppercase mb-2">Friends</div>
-                @foreach($users as $user)
-                <div class="mx-3 mb-2 bg-[#111c31] border border-slate-800 rounded-xl hover:bg-[#14233d] cursor-pointer user-item transition"
-                    data-user-id="{{ $user->id }}"
-                    data-peer-id="{{ $user->peer_id }}">
-                    <div class="flex items-center gap-3 p-3">
-                        <div class="relative">
-                            <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center font-bold text-white text-sm">
-                                {{ strtoupper(substr($user->name,0,1)) }}
-                            </div>
-                            <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-[#0b1220]"></div>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h3 class="font-semibold text-sm truncate">{{ $user->name }}</h3>
-                            <p class="text-xs text-slate-400 truncate last-message" data-user-id="{{ $user->id }}">Online</p>
-                        </div>
-                        <div class="flex gap-1">
-                            <button class="voiceCallBtn bg-emerald-600 hover:bg-emerald-500 p-2 rounded-lg text-xs"
-                                data-peer="{{ $user->peer_id }}"
-                                data-user="{{ $user->name }}"
-                                data-user-id="{{ $user->id }}">📞</button>
-                            <button class="videoCallBtn bg-blue-600 hover:bg-blue-500 p-2 rounded-lg text-xs"
-                                data-peer="{{ $user->peer_id }}"
-                                data-user="{{ $user->name }}"
-                                data-user-id="{{ $user->id }}">📹</button>
-                        </div>
+                <div class="flex items-center gap-3">
+                    <img src="/images/logo.png" class="h-14 object-contain" alt="Logo">
+                    <div>
+                        <h1 class="text-2xl font-bold text-indigo-400">PeerConnect</h1>
+                        <p class="text-slate-400 text-[11px] font-medium mt-0.5 whitespace-nowrap">Video Meetings & Chat</p>
                     </div>
                 </div>
-                @endforeach
+            </div>
+
+            <!-- FRIENDS LIST PLACEHOLDER -->
+            <div class="flex-1 overflow-y-auto">
             </div>
 
             <!-- LOGOUT BUTTON -->
             <div class="p-4 border-t border-slate-800">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="w-full text-left text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 px-4 py-2 rounded-lg transition flex items-center gap-3">
+                    <button type="submit" class="w-full text-left text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 px-4 py-2.5 rounded-xl transition flex items-center gap-3 font-semibold">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                         </svg>
@@ -71,11 +42,11 @@
         <!-- ============================================================
         RIGHT CHAT AREA
         ============================================================ -->
-        <div class="flex-1 flex flex-col bg-[#07111f]">
+        <div class="flex-1 flex flex-col bg-slate-950">
             <!-- HEADER -->
-            <div class="h-20 border-b border-slate-800 flex items-center justify-between px-6 bg-[#0b1220] shadow-sm">
+            <div class="h-20 border-b border-slate-800 flex items-center justify-between px-6 bg-slate-900 shadow-md">
                 <div id="headerLeft">
-                    <h2 id="appName" class="font-bold text-xl text-white">PeerConnect</h2>
+                    <div id="appName" class="hidden"></div>
                     <div id="friendInfo" class="hidden flex items-center gap-2">
                         <span id="selectedUser" class="font-bold text-xl text-white">Friend Name</span>
                         <span id="onlineStatus" class="text-sm text-emerald-400">● Online</span>
@@ -85,58 +56,68 @@
                 <div id="headerRight" class="flex gap-2 items-center">
                     <div id="dashboardButtons" class="flex gap-2">
                         <a href="{{ route('meeting.create') }}"
-                            class="h-10 px-4 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold flex items-center gap-2 transition">
+                            class="h-10 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border border-indigo-700/50 text-white text-sm font-semibold flex items-center gap-2 transition active:scale-95 shadow-md">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                             </svg>
                             Host
                         </a>
                         <button id="joinMeetingBtn"
-                            class="h-10 px-4 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold flex items-center gap-2 transition">
+                            class="h-10 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border border-indigo-700/50 text-white text-sm font-semibold flex items-center gap-2 transition active:scale-95 shadow-md">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                             </svg>
                             Join
                         </button>
+                        <a href="{{ route('recordings.index') }}"
+                            class="h-10 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border border-indigo-700/50 text-white text-sm font-semibold flex items-center gap-2 transition active:scale-95 shadow-md">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                            </svg>
+                            Recordings
+                        </a>
                         <a id="settingsBtn" href="{{ route('profile.edit') }}"
-                            class="h-10 w-10 rounded-lg border border-slate-700 bg-[#111c31] text-slate-300 hover:text-white hover:bg-[#14233d] transition flex items-center justify-center text-lg">
-                            ⚙️
+                            class="h-10 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border border-indigo-700/50 text-white text-sm font-semibold flex items-center gap-2 transition active:scale-95 shadow-md">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.591 1.06c1.527-.917 3.293.85 2.376 2.377a1.724 1.724 0 001.06 2.591c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.06 2.591c.917 1.527-.85 3.293-2.377 2.376a1.724 1.724 0 00-2.591 1.06c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.591-1.06c-1.527.917-3.293-.85-2.376-2.377a1.724 1.724 0 00-1.06-2.591c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.06-2.591c-.917-1.527.85-3.293 2.377-2.376.918.555 2.118.038 2.591-1.06z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            Settings
                         </a>
                     </div>
 
                     <div id="chatButtons" class="hidden flex gap-2">
-                        <button id="headerVoiceCall" class="h-10 px-4 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold flex items-center gap-2 transition">
+                        <button id="headerVoiceCall" class="h-10 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border border-indigo-700/50 text-white text-sm font-semibold flex items-center gap-2 transition active:scale-95 shadow-md">
                             📞 Call
                         </button>
-                        <button id="headerVideoCall" class="h-10 px-4 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold flex items-center gap-2 transition">
+                        <button id="headerVideoCall" class="h-10 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border border-indigo-700/50 text-white text-sm font-semibold flex items-center gap-2 transition active:scale-95 shadow-md">
                             📹 Video
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div id="chatMessages" class="flex-1 overflow-y-auto p-6 bg-[#0a1324]">
+            <div id="chatMessages" class="flex-1 overflow-y-auto p-6 bg-slate-950/60 shadow-inner">
                 <div id="emptyState" class="text-center text-slate-400 mt-20">
-                    <p class="text-4xl mb-2">💬</p>
-                    <p>Click a friend from the sidebar to chat</p>
+
                 </div>
             </div>
 
-            <div id="messageContainer" class="bg-[#0b1220] border-t border-slate-800 p-4 flex gap-3 hidden">
+            <div id="messageContainer" class="bg-slate-900 border-t border-slate-800 p-4 flex gap-3 hidden">
                 <input id="message" type="text" placeholder="Type a message..."
-                    class="flex-1 rounded-xl border border-slate-700 bg-[#111c31] px-4 py-2 text-white placeholder-slate-400 focus:border-blue-500 focus:ring-blue-500">
-                <button id="sendBtn" class="bg-blue-600 hover:bg-blue-500 text-white px-6 rounded-xl transition">
+                    class="flex-1 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-600 shadow-sm">
+                <button id="sendBtn" class="bg-indigo-600 hover:bg-indigo-500 border border-indigo-700/50 text-white px-6 rounded-xl transition font-semibold active:scale-95 shadow-md">
                     Send
                 </button>
             </div>
         </div>
     </div>
 
-    <div id="joinMeetingModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 hidden">
-        <div class="bg-[#0f172a] border border-slate-700 rounded-2xl max-w-md w-full mx-4 p-8 shadow-2xl">
+    <div id="joinMeetingModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full mx-4 p-8 shadow-2xl">
             <div class="flex items-center gap-3 mb-4">
-                <div class="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center">
-                    <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-12 h-12 rounded-full bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20">
+                    <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
                 </div>
@@ -144,10 +125,10 @@
             </div>
             <p class="text-slate-400 text-sm mb-4">Enter the meeting code or paste the full link to join.</p>
             <input type="text" id="meetingLinkInput" placeholder="Enter room code (e.g., ABC123)..."
-                class="w-full rounded-xl border border-slate-700 bg-[#111c31] px-4 py-3 mb-4 text-white placeholder-slate-400 focus:border-blue-500 focus:ring-blue-500 focus:outline-none">
+                class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 mb-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-600 shadow-sm">
             <div class="flex gap-3">
-                <button id="joinModalCancel" class="flex-1 px-4 py-2 rounded-lg border border-slate-700 text-slate-200 hover:bg-[#14233d] transition">Cancel</button>
-                <button id="joinModalSubmit" class="flex-1 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-500 transition">Join</button>
+                <button id="joinModalCancel" class="flex-1 px-4 py-2.5 rounded-xl border border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white transition">Cancel</button>
+                <button id="joinModalSubmit" class="flex-1 px-4 py-2.5 rounded-xl bg-indigo-600 text-white hover:bg-indigo-500 border border-indigo-700/50 shadow-md transition">Join</button>
             </div>
         </div>
     </div>
@@ -454,13 +435,16 @@
         // ============================================================
         // SEARCH FRIENDS
         // ============================================================
-        document.getElementById('searchUsers').addEventListener('keyup', function(e) {
-            const query = e.target.value.toLowerCase();
-            document.querySelectorAll('.user-item').forEach(function(el) {
-                const name = el.querySelector('h3').textContent.toLowerCase();
-                el.style.display = name.includes(query) ? '' : 'none';
+        const searchInput = document.getElementById('searchUsers');
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function(e) {
+                const query = e.target.value.toLowerCase();
+                document.querySelectorAll('.user-item').forEach(function(el) {
+                    const name = el.querySelector('h3').textContent.toLowerCase();
+                    el.style.display = name.includes(query) ? '' : 'none';
+                });
             });
-        });
+        }
 
         // ============================================================
         // CALL BUTTONS

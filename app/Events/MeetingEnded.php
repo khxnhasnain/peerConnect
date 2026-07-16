@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -23,7 +23,7 @@ class MeetingEnded implements ShouldBroadcast
 
     public function broadcastOn()
     {
-        return new Channel('meeting.' . $this->meeting_id);
+        return new PrivateChannel('meeting.' . $this->meeting_id);
     }
 
     public function broadcastWith()
