@@ -2,29 +2,37 @@
     <div class="min-h-screen bg-slate-950 text-slate-100 py-10 px-4 md:px-8">
         <div class="max-w-6xl mx-auto">
             <!-- Header -->
-            <div class="flex items-center justify-between gap-4 mb-10 p-6 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl">
+            <div class="flex items-center justify-between gap-4 mb-10 p-6 bg-slate-900 border-2 border-indigo-800 rounded-2xl shadow-xl">
                 <div class="min-w-0">
-                    <h1 class="text-3xl font-extrabold text-white tracking-tight">Recordings</h1>
+                    <h1 class="text-xl font-bold text-white tracking-tight">Recordings</h1>
                 </div>
-                <a href="{{ route('dashboard') }}" class="h-10 px-4 shrink-0 rounded-xl bg-indigo-600 hover:bg-indigo-500 border border-indigo-700/50 text-white text-sm font-semibold transition flex items-center justify-center shadow-md active:scale-95 ml-auto" aria-label="Back to dashboard">
+                <a href="{{ route('dashboard') }}" class="h-10 px-4 shrink-0 rounded-xl bg-indigo-600 hover:bg-indigo-500 border-2 border-indigo-800 text-white text-sm font-semibold transition flex items-center justify-center shadow-md active:scale-95 ml-auto" aria-label="Back to dashboard">
                     Back
                 </a>
             </div>
 
             <!-- Session Messages -->
             @if(session('success'))
-            <div class="mb-6 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm flex items-center gap-2">
-                {{ session('success') }}
+            <div class="mb-6 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm flex items-center justify-between gap-2 alert-banner shadow-sm">
+                <span class="flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    {{ session('success') }}
+                </span>
+                <button type="button" onclick="this.closest('.alert-banner').remove()" class="text-emerald-400 hover:text-emerald-200 transition font-bold text-lg leading-none p-1">&times;</button>
             </div>
             @endif
             @if(session('error'))
-            <div class="mb-6 p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm flex items-center gap-2">
-                {{ session('error') }}
+            <div class="mb-6 p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm flex items-center justify-between gap-2 alert-banner shadow-sm">
+                <span class="flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    {{ session('error') }}
+                </span>
+                <button type="button" onclick="this.closest('.alert-banner').remove()" class="text-rose-400 hover:text-rose-200 transition font-bold text-lg leading-none p-1">&times;</button>
             </div>
             @endif
 
             <!-- Grid Layout -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="flex flex-col gap-8">
 
                 <!-- 1. Hosted Recordings -->
                 <div class="space-y-6 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
@@ -34,34 +42,33 @@
 
                     @if($hostedRecordings->isEmpty())
                     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-10 text-center text-slate-500 shadow-lg">
-                        <p class="text-sm">You haven't hosted any recorded meetings yet.</p>
+                        <p class="text-sm">No records</p>
                     </div>
                     @else
                     @foreach($hostedRecordings as $rec)
-                    <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-6 shadow-xl hover:border-slate-700/85 transition-all duration-300 flex flex-col gap-4">
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl hover:border-slate-700/85 transition-all duration-300 flex flex-col gap-4">
                         <div>
                             <div class="flex justify-between items-start gap-2 mb-2">
-                                <h3 class="font-bold text-white text-base truncate">{{ $rec->meeting->meeting_name ?? 'Meeting Recording' }}</h3>
-                                <span class="text-[10px] font-mono bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded border border-slate-700">{{ $rec->meeting->room_id ?? 'N/A' }}</span>
+                                <h3 class="font-bold text-white text-base truncate">{{ str_replace('Meeting ', '', $rec->meeting->meeting_name ?? '') }} | {{ $rec->created_at->format('M d, Y') }} | {{ $rec->created_at->format('h:i A') }}</h3>
+                                <span class="text-base font-bold text-slate-300 shrink-0">{{ $rec->duration }}</span>
                             </div>
                             <p class="text-xs text-slate-400">Recorded by: <span class="text-slate-350 font-medium">{{ $rec->user->name ?? 'Unknown' }}</span></p>
-                            <p class="text-xs text-slate-500 mt-1">Date: {{ $rec->created_at->format('M d, Y h:i A') }}</p>
                         </div>
 
                         <!-- Host Actions -->
                         <div class="flex flex-wrap items-center gap-2 pt-3">
                             <button data-url="{{ route('recordings.play', $rec->id) }}" data-title="{{ $rec->meeting->meeting_name ?? 'Recording' }}" onclick="playVideo(this.dataset.url, this.dataset.title)"
-                                class="h-9 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border border-indigo-700/50 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95">
+                                class="h-9 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border-2 border-indigo-800 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95">
                                 Play
                             </button>
                             <a href="{{ route('recordings.download', $rec->id) }}"
-                                class="h-9 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border border-indigo-700/50 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95">
+                                class="h-9 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border-2 border-indigo-800 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95">
                                 Download
                             </a>
                             <form action="{{ route('recordings.destroy', $rec->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this recording?')" class="inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="h-9 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border border-indigo-700/50 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95">
+                                <button type="submit" class="h-9 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border-2 border-indigo-800 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95">
                                     Delete
                                 </button>
                             </form>
@@ -78,15 +85,15 @@
 
                                     <div class="host-status-container flex items-center gap-2">
                                         @if($part->request_status === 'pending')
-                                        <span class="text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-xl text-[10px] font-medium">Pending Request</span>
-                                        <button type="button" data-request-id="{{ $part->request_id }}" onclick="actionDownloadRequest(this.dataset.requestId, 'approve', this)" class="h-8 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 border border-indigo-700/50 shadow-md text-white text-[10px] font-bold transition active:scale-95">Approve</button>
+                                        <span class="text-amber-400 bg-amber-500/10 border-2 border-amber-500 px-2 py-0.5 rounded-xl text-[10px] font-medium">Pending Request</span>
+                                        <button type="button" data-request-id="{{ $part->request_id }}" onclick="actionDownloadRequest(this.dataset.requestId, 'approve', this)" class="h-8 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 border-2 border-indigo-800 shadow-md text-white text-[10px] font-bold transition active:scale-95">Approve</button>
                                         <button type="button" data-request-id="{{ $part->request_id }}" onclick="actionDownloadRequest(this.dataset.requestId, 'reject', this)" class="h-8 px-3 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 text-[10px] font-bold hover:bg-slate-800 transition ml-1 active:scale-95">Reject</button>
                                         @elseif($part->request_status === 'approved')
-                                        <span class="text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-xl text-[10px] font-medium">✓</span>
-                                        <button type="button" data-request-id="{{ $part->request_id }}" onclick="actionDownloadRequest(this.dataset.requestId, 'reject', this)" class="h-8 w-8 rounded-xl bg-indigo-600 hover:bg-indigo-500 border border-indigo-700/50 text-white text-xs font-bold transition ml-2 shadow-md active:scale-95 flex items-center justify-center">✕</button>
+                                        <span class="text-emerald-400 bg-emerald-500/10 border-2 border-emerald-500 px-2 py-0.5 rounded-xl text-[10px] font-medium">✓</span>
+                                        <button type="button" data-request-id="{{ $part->request_id }}" onclick="actionDownloadRequest(this.dataset.requestId, 'reject', this)" class="h-8 w-8 rounded-xl bg-indigo-600 hover:bg-indigo-500 border-2 border-indigo-800 text-white text-xs font-bold transition ml-2 shadow-md active:scale-95 flex items-center justify-center">✕</button>
                                         @elseif($part->request_status === 'rejected')
-                                        <span class="text-rose-400 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-xl text-[10px] font-medium">✕</span>
-                                        <button type="button" data-request-id="{{ $part->request_id }}" onclick="actionDownloadRequest(this.dataset.requestId, 'approve', this)" class="h-8 w-8 rounded-xl bg-indigo-600 hover:bg-indigo-500 border border-indigo-700/50 text-white text-xs font-bold transition ml-2 shadow-md active:scale-95 flex items-center justify-center">✓</button>
+                                        <span class="text-rose-400 bg-rose-500/10 border-2 border-rose-500 px-2 py-0.5 rounded-xl text-[10px] font-medium">✕</span>
+                                        <button type="button" data-request-id="{{ $part->request_id }}" onclick="actionDownloadRequest(this.dataset.requestId, 'approve', this)" class="h-8 w-8 rounded-xl bg-indigo-600 hover:bg-indigo-500 border-2 border-indigo-800 text-white text-xs font-bold transition ml-2 shadow-md active:scale-95 flex items-center justify-center">✓</button>
                                         @else
                                         <span class="text-slate-500 text-[10px]">No download request</span>
                                         @endif
@@ -101,6 +108,9 @@
                     @endif
                 </div>
 
+                <!-- Thin white separator line -->
+                <div class="border-t border-white/20 my-4"></div>
+
                 <!-- 2. Shared Recordings -->
                 <div class="space-y-6 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
                     <h2 class="text-xl font-bold text-indigo-400 flex items-center gap-2">
@@ -108,20 +118,19 @@
                     </h2>
 
                     @if($sharedRecordings->isEmpty())
-                    <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-10 text-center text-slate-500 shadow-lg">
-                        <p class="text-sm">No recorded meetings shared with you.</p>
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-10 text-center text-slate-500 shadow-lg">
+                        <p class="text-sm">No records</p>
                     </div>
                     @else
                     @foreach($sharedRecordings as $rec)
                     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl hover:border-slate-700/85 transition-all duration-300 flex flex-col gap-4">
                         <div>
                             <div class="flex justify-between items-start gap-2 mb-2">
-                                <h3 class="font-bold text-white text-base truncate">{{ $rec->meeting->meeting_name ?? 'Meeting Recording' }}</h3>
-                                <span class="text-[10px] font-mono bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded border border-slate-700">{{ $rec->meeting->room_id ?? 'N/A' }}</span>
+                                <h3 class="font-bold text-white text-base truncate">{{ str_replace('Meeting ', '', $rec->meeting->meeting_name ?? '') }} | {{ $rec->created_at->format('M d, Y') }} | {{ $rec->created_at->format('h:i A') }}</h3>
+                                <span class="text-base font-bold text-slate-300 shrink-0">{{ $rec->duration }}</span>
                             </div>
                             <p class="text-xs text-slate-400">Host: <span class="text-slate-350 font-medium">{{ $rec->meeting->creator->name ?? 'Unknown' }}</span></p>
                             <p class="text-xs text-slate-400 mt-1">Recorded by: <span class="text-slate-350 font-medium">{{ $rec->user->name ?? 'Unknown' }}</span></p>
-                            <p class="text-xs text-slate-500 mt-1">Date: {{ $rec->created_at->format('M d, Y h:i A') }}</p>
                         </div>
 
                         <!-- Participant Actions -->
@@ -131,7 +140,7 @@
                             <div class="participant-actions-container font-semibold" data-recording-id="{{ $rec->id }}" data-download-url="{{ route('recordings.download', $rec->id) }}">
                                 @if($rec->my_request_status === 'approved')
                                 <a href="{{ route('recordings.download', $rec->id) }}"
-                                    class="h-9 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border border-indigo-700/50 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95">
+                                    class="h-9 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border-2 border-indigo-800 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95">
                                     Download
                                 </a>
                                 @elseif($rec->my_request_status === 'pending')
@@ -144,7 +153,7 @@
                                 </button>
                                 @else
                                 <button type="button" data-recording-id="{{ $rec->id }}" onclick="submitRequestDownload(this.dataset.recordingId, this)"
-                                    class="h-9 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border border-indigo-700/50 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95">
+                                    class="h-9 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border-2 border-indigo-800 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95">
                                     Request Download
                                 </button>
                                 @endif
@@ -166,7 +175,7 @@
             <!-- Modal Header -->
             <div class="px-6 py-4 bg-slate-900 border-b border-slate-800 flex justify-between items-center">
                 <h3 id="videoModalTitle" class="font-bold text-white text-base truncate">Play Recording</h3>
-                <button onclick="closeVideo()" class="h-10 w-10 rounded-xl bg-indigo-600 hover:bg-indigo-500 border border-indigo-700/50 text-white transition flex items-center justify-center shadow-md active:scale-95">Close</button>
+                <button onclick="closeVideo()" class="h-10 w-10 rounded-xl bg-indigo-600 hover:bg-indigo-500 border-2 border-indigo-800 text-white transition flex items-center justify-center shadow-md active:scale-95">Close</button>
             </div>
 
             <!-- Video Content -->
@@ -176,7 +185,7 @@
 
             <!-- Modal Footer -->
             <div class="px-6 py-4 bg-slate-900 border-t border-slate-800 flex justify-end">
-                <button onclick="closeVideo()" class="h-10 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border border-indigo-700/50 text-white text-sm font-semibold transition shadow-md active:scale-95">Close</button>
+                <button onclick="closeVideo()" class="h-10 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border-2 border-indigo-800 text-white text-sm font-semibold transition shadow-md active:scale-95">Close</button>
             </div>
         </div>
     </div>
@@ -250,19 +259,19 @@
                             let html = '';
                             if (currentStatus === 'pending') {
                                 html = `
-                                <span class="text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-xl text-[10px] font-medium">Pending Request</span>
-                                <button type="button" onclick="actionDownloadRequest(${reqId}, 'approve', this)" class="h-8 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 border border-indigo-700/50 shadow-md text-white text-[10px] font-bold transition active:scale-95">Approve</button>
+                                <span class="text-amber-400 bg-amber-500/10 border-2 border-amber-500 px-2 py-0.5 rounded-xl text-[10px] font-medium">Pending Request</span>
+                                <button type="button" onclick="actionDownloadRequest(${reqId}, 'approve', this)" class="h-8 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 border-2 border-indigo-800 shadow-md text-white text-[10px] font-bold transition active:scale-95">Approve</button>
                                 <button type="button" onclick="actionDownloadRequest(${reqId}, 'reject', this)" class="h-8 px-3 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 text-[10px] font-bold hover:bg-slate-800 transition ml-1 active:scale-95">Reject</button>
                             `;
                             } else if (currentStatus === 'approved') {
                                 html = `
-                                <span class="text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-xl text-[10px] font-medium">Approved ✅</span>
-                                <button type="button" onclick="actionDownloadRequest(${reqId}, 'reject', this)" class="h-8 w-8 rounded-xl bg-indigo-600 hover:bg-indigo-500 border border-indigo-700/50 text-white text-[10px] font-bold transition ml-2 shadow-md active:scale-95 flex items-center justify-center">✕</button>
+                                <span class="text-emerald-400 bg-emerald-500/10 border-2 border-emerald-500 px-2 py-0.5 rounded-xl text-[10px] font-medium">Approved ✅</span>
+                                <button type="button" onclick="actionDownloadRequest(${reqId}, 'reject', this)" class="h-8 w-8 rounded-xl bg-indigo-600 hover:bg-indigo-500 border-2 border-indigo-800 text-white text-[10px] font-bold transition ml-2 shadow-md active:scale-95 flex items-center justify-center">✕</button>
                             `;
                             } else if (currentStatus === 'rejected') {
                                 html = `
-                                <span class="text-rose-400 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-xl text-[10px] font-medium">Rejected ❌</span>
-                                <button type="button" onclick="actionDownloadRequest(${reqId}, 'approve', this)" class="h-8 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 border border-indigo-700/50 text-white text-[10px] font-bold transition ml-2 shadow-md active:scale-95">✓</button>
+                                <span class="text-rose-400 bg-rose-500/10 border-2 border-rose-500 px-2 py-0.5 rounded-xl text-[10px] font-medium">Rejected ❌</span>
+                                <button type="button" onclick="actionDownloadRequest(${reqId}, 'approve', this)" class="h-8 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 border-2 border-indigo-800 text-white text-[10px] font-bold transition ml-2 shadow-md active:scale-95">✓</button>
                             `;
                             } else {
                                 html = `<span class="text-slate-500 text-[10px]">No download request</span>`;
@@ -287,7 +296,7 @@
                         if (currentStatus === 'approved') {
                             html = `
                             <a href="${downloadUrl}"
-                                class="h-9 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border border-indigo-700/50 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95">
+                                class="h-9 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border-2 border-indigo-800 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95">
                                 Download
                             </a>
                         `;
@@ -306,7 +315,7 @@
                         } else {
                             html = `
                             <button type="button" onclick="submitRequestDownload(${recId}, this)"
-                                class="h-9 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border border-indigo-700/50 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95">
+                                class="h-9 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border-2 border-indigo-800 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95">
                                 Request Download
                             </button>
                         `;

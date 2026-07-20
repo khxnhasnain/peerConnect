@@ -16,34 +16,77 @@ use App\Events\HandRaised;
 
 class MeetingController extends Controller
 {
-    public function create()
+    public function create(Request $request)
     {
         try {
-            $roomId = strtoupper(Str::random(6));
+            $letters = 'abcdefghijklmnopqrstuvwxyz';
+            $roomId = substr(str_shuffle($letters), 0, 3) . '-' . substr(str_shuffle($letters), 0, 4) . '-' . substr(str_shuffle($letters), 0, 3);
+
+            $startAt = null;
+            if ($request->filled('start_at')) {
+                try {
+                    $startAt = \Carbon\Carbon::parse($request->start_at);
+                } catch (\Exception $e) {
+                    return response()->json(['error' => 'Invalid date and time format.'], 422);
+                }
+            }
 
             $meeting = Meeting::create([
                 'room_id'      => $roomId,
                 'created_by'   => Auth::id(),
                 'meeting_name' => 'Meeting ' . $roomId,
+                'start_at'     => $startAt,
             ]);
+
+            if ($startAt && $startAt->isFuture()) {
+                return response()->json([
+                    'success'  => true,
+                    'room_id'  => $roomId,
+                    'start_at' => $startAt->format('M d, Y h:i A'),
+                    'join_url' => route('meeting.join', $roomId),
+                ]);
+            }
 
             $peerId = 'user-' . Auth::id() . '-' . time();
 
             MeetingParticipant::create([
-                'meeting_id' => $meeting->id,
-                'user_id' => Auth::id(),
-                'peer_id' => $peerId,
+                'meeting_id'     => $meeting->id,
+                'user_id'        => Auth::id(),
+                'peer_id'        => $peerId,
+                'is_audio_muted' => true,
             ]);
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success'  => true,
+                    'join_url' => route('meeting.join', $roomId),
+                ]);
+            }
 
             return redirect()->route('meeting.join', $roomId);
         } catch (\Exception $e) {
+            if ($request->expectsJson()) {
+                return response()->json(['error' => 'Failed to create meeting: ' . $e->getMessage()], 500);
+            }
             return back()->with('error', 'Failed to create meeting: ' . $e->getMessage());
         }
     }
 
     public function join($roomId)
     {
-        $meeting = Meeting::where('room_id', $roomId)->firstOrFail();
+        $meeting = Meeting::withTrashed()->where('room_id', $roomId)->first();
+
+        if (!$meeting) {
+            return redirect()->route('dashboard')->with('error', 'Meeting code is invalid.');
+        }
+
+        if ($meeting->trashed()) {
+            return redirect()->route('dashboard')->with('error', 'This meeting has been ended.');
+        }
+
+        if ($meeting->start_at && \Carbon\Carbon::parse($meeting->start_at)->isFuture()) {
+            return view('meeting-waiting', compact('meeting'));
+        }
 
         $participant = MeetingParticipant::where('meeting_id', $meeting->id)
             ->where('user_id', Auth::id())
@@ -52,14 +95,34 @@ class MeetingController extends Controller
         if (!$participant) {
             $peerId = 'user-' . Auth::id() . '-' . time();
 
-            MeetingParticipant::create([
-                'meeting_id' => $meeting->id,
-                'user_id' => Auth::id(),
-                'peer_id' => $peerId,
+            $participant = MeetingParticipant::create([
+                'meeting_id'     => $meeting->id,
+                'user_id'        => Auth::id(),
+                'peer_id'        => $peerId,
+                'is_audio_muted' => true,
             ]);
         }
 
-        return view('meeting', compact('meeting'));
+        return view('meeting', compact('meeting', 'participant'));
+    }
+
+    public function checkStatus($roomId)
+    {
+        $meeting = Meeting::where('room_id', $roomId)->first();
+
+        if (!$meeting) {
+            return response()->json(['status' => 'deleted']);
+        }
+
+        if ($meeting->start_at && \Carbon\Carbon::parse($meeting->start_at)->isFuture()) {
+            return response()->json([
+                'status' => 'scheduled',
+                'start_at' => $meeting->start_at,
+                'remaining_seconds' => now()->diffInSeconds($meeting->start_at, false)
+            ]);
+        }
+
+        return response()->json(['status' => 'active']);
     }
 
     private function joinMeeting($meetingId, $peerId)
@@ -101,6 +164,7 @@ class MeetingController extends Controller
                     'is_admin'       => (bool) ($p->is_admin ?? false),
                     'is_host'        => (int) $p->user_id === (int) $meeting->created_by,
                     'hand_raised'    => (bool) ($p->hand_raised ?? false),
+                    'user_avatar'    => $p->user ? $p->user->avatar : null,
                 ];
             });
 
@@ -121,7 +185,10 @@ class MeetingController extends Controller
         $meeting = Meeting::findOrFail($meetingId);
 
         if ($meeting->created_by != Auth::id()) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+            if (request()->expectsJson() || request()->ajax()) {
+                return response()->json(['error' => 'Unauthorized'], 403);
+            }
+            return redirect()->route('dashboard')->with('error', 'Unauthorized');
         }
 
         try {
@@ -134,7 +201,10 @@ class MeetingController extends Controller
         MeetingParticipant::where('meeting_id', $meetingId)->delete();
         $meeting->delete();
 
-        return response()->json(['success' => true]);
+        if (request()->expectsJson() || request()->ajax()) {
+            return response()->json(['success' => true]);
+        }
+        return redirect()->route('dashboard')->with('success', 'Meeting cancelled successfully.');
     }
 
     // ============================================================
@@ -290,6 +360,18 @@ class MeetingController extends Controller
         }
 
         $participant->save();
+
+        try {
+            broadcast(new \App\Events\ParticipantMediaStateChanged(
+                $meetingId,
+                Auth::id(),
+                $participant->peer_id,
+                $participant->is_audio_muted,
+                $participant->is_video_off
+            ));
+        } catch (\Exception $e) {
+            \Log::warning('MediaStateChanged broadcast failed: ' . $e->getMessage());
+        }
 
         return response()->json(['success' => true]);
     }
@@ -449,6 +531,7 @@ class MeetingController extends Controller
                     'is_admin'       => (bool) ($p->is_admin ?? false),
                     'is_host'        => (int) $p->user_id === (int) $meeting->created_by,
                     'hand_raised'    => (bool) ($p->hand_raised ?? false),
+                    'user_avatar'    => $p->user ? $p->user->avatar : null,
                 ];
             });
 

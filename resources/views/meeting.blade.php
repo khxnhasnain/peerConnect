@@ -7,15 +7,20 @@
                     <img src="/images/logo.png" class="h-14 w-auto rounded-lg shadow-sm object-contain" alt="Logo">
                 </div>
 
-                <div class="flex items-center gap-3 text-slate-200 font-medium select-none text-[15px] pl-2">
+                <div class="flex items-center gap-3 text-slate-200 font-medium select-none text-[17px] pl-2">
                     <span id="meetingTimer" class="font-semibold text-slate-100">14:01</span>
-                    <span class="text-slate-600 font-light">|</span>
-                    <span class="font-semibold select-all font-mono lowercase text-slate-100">{{ $meeting->room_id ?? 'N/A' }}</span>
+                    <span class="text-white font-light">|</span>
+                    <div class="flex items-center gap-1.5">
+                        <span class="font-semibold select-all font-mono lowercase text-slate-100">{{ $meeting->room_id ?? 'N/A' }}</span>
+                        <button id="copyLinkBtn" style="width: 16px; height: 16px; min-width: 16px; min-height: 16px; background-color: transparent; border: 2px solid #ffffff; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; margin-left: 10px; transition: background-color 0.2s, transform 0.1s; outline: none;" onmouseover="this.style.backgroundColor='rgba(255,255,255,0.15)'" onmouseout="this.style.backgroundColor='transparent'" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'" title="Copy Meeting Link">
+                            <span style="font-family: Arial, Helvetica, sans-serif; font-weight: bold; font-size: 10px; color: #cbd5e1; line-height: 1; display: inline-block; transform: translateY(0.5px);">i</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <div class="flex items-center gap-2">
-                <button id="participantCountBtn" type="button" class="h-10 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border border-indigo-700/50 text-white text-sm font-semibold transition cursor-pointer active:scale-95 shadow-md flex items-center gap-2">
+                <button id="participantCountBtn" type="button" class="h-10 px-4 rounded-full bg-indigo-600 hover:bg-indigo-500 border-2 border-indigo-800 text-white text-sm font-semibold transition cursor-pointer active:scale-95 shadow-md flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
                         <!-- Top person -->
                         <circle cx="12" cy="6" r="2.5" />
@@ -33,7 +38,7 @@
                     <span id="participantCount" class="font-mono">1</span>
                 </button>
                 @if(Auth::id() == $meeting->created_by)
-                <button id="endMeetingBtn" class="h-10 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border border-indigo-700/50 text-white text-sm font-semibold flex items-center gap-2 transition active:scale-95 shadow-md">
+                <button id="endMeetingBtn" class="h-10 px-4 rounded-full bg-indigo-600 hover:bg-indigo-500 border-2 border-indigo-800 text-white text-sm font-semibold flex items-center gap-2 transition active:scale-95 shadow-md">
                     End Meeting
                 </button>
                 @endif
@@ -61,15 +66,15 @@
 
                 <div class="w-full pb-4 pt-3 px-4 md:px-6 flex justify-center z-10 shrink-0 bg-slate-900/95 border-t border-slate-800 shadow-md">
                     <div class="flex items-center justify-center gap-4 whitespace-nowrap bg-slate-900 border border-slate-800 shadow-2xl rounded-xl px-6 py-2.5">
-                        <button id="toggleAudioBtn" class="bg-slate-850 hover:bg-slate-800 text-white p-3 rounded-full w-14 h-14 flex items-center justify-center transition active:scale-95 shadow-md border border-slate-700/50" title="Mute/Unmute Microphone">
-                            <svg id="micOnIcon" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <button id="toggleAudioBtn" class="bg-black hover:bg-zinc-900 border-2 border-zinc-700 text-white p-3 rounded-full w-14 h-14 flex items-center justify-center transition active:scale-95 shadow-md" title="Mute/Unmute Microphone">
+                            <svg id="micOnIcon" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
                                 <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
                                 <line x1="12" y1="19" x2="12" y2="23"></line>
                                 <line x1="8" y1="23" x2="16" y2="23"></line>
                             </svg>
 
-                            <svg id="micOffIcon" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg id="micOffIcon" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
                                 <line x1="1" y1="1" x2="23" y2="23"></line>
                                 <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path>
                                 <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path>
@@ -77,7 +82,7 @@
                                 <line x1="8" y1="23" x2="16" y2="23"></line>
                             </svg>
                         </button>
-                        <button id="toggleVideoBtn" class="bg-slate-850 hover:bg-slate-800 text-white p-3 rounded-full w-14 h-14 flex items-center justify-center transition active:scale-95 shadow-md border border-slate-700/50" title="Turn Camera On/Off">
+                        <button id="toggleVideoBtn" class="bg-black hover:bg-zinc-900 border-2 border-zinc-700 text-white p-3 rounded-full w-14 h-14 flex items-center justify-center transition active:scale-95 shadow-md" title="Turn Camera On/Off">
                             <svg id="camOnIcon" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M14 6a3 3 0 0 1 3 3v1.75l4.62-2.31A1 1 0 0 1 23 9.33v5.34a1 1 0 0 1-1.38.92L17 13.25V15a3 3 0 0 1-3 3H4a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3h10z"/>
                             </svg>
@@ -92,7 +97,7 @@
                                 <line x1="3" y1="21" x2="21" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none" />
                             </svg>
                         </button>
-                        <button id="screenShareBtn" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 p-3 rounded-full w-14 h-14 flex items-center justify-center transition active:scale-95 shadow-md" title="Share Your Screen Now">
+                        <button id="screenShareBtn" class="bg-black hover:bg-zinc-900 border-2 border-zinc-700 text-white p-3 rounded-full w-14 h-14 flex items-center justify-center transition active:scale-95 shadow-md" title="Share Your Screen Now">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
                                 <defs>
                                     <mask id="screen-arrow-mask">
@@ -107,29 +112,31 @@
                                 <path d="M7 17.5c0 1.38 1.12 2.5 2.5 2.5h5c1.38 0 2.5-1.12 2.5-2.5v-0.5H7v0.5z M8.5 17.5h7v0.5c0 .55-.45 1-1 1h-5c-.55 0-1-.45-1-1v-0.5z" fill-rule="evenodd" clip-rule="evenodd" />
                             </svg>
                         </button>
-                        <button id="raiseHandBtn" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 p-3 rounded-full w-14 h-14 flex items-center justify-center transition active:scale-95 shadow-md" title="Raise Hand">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"></path>
-                                <path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"></path>
-                                <path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"></path>
+                        <button id="raiseHandBtn" class="bg-black hover:bg-zinc-900 border-2 border-zinc-700 text-white p-3 rounded-full w-14 h-14 flex items-center justify-center transition active:scale-95 shadow-md" title="Raise Hand">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M18 11V3a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"></path>
+                                <path d="M14 10V1a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"></path>
+                                <path d="M10 10.5V2a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"></path>
                                 <path d="M6 14v-1.5a1.5 1.5 0 0 0-3 0V16a6 6 0 0 0 6 6h6.5A5.5 5.5 0 0 0 21 16.5v-2a1.5 1.5 0 0 0-3 0"></path>
                             </svg>
                         </button>
-                        <button id="recordBtn" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 p-3 rounded-full w-14 h-14 flex items-center justify-center transition active:scale-95 shadow-md" title="Record Meeting">
+                        <button id="recordBtn" class="bg-black hover:bg-zinc-900 border-2 border-zinc-700 text-white p-3 rounded-full w-14 h-14 flex items-center justify-center transition active:scale-95 shadow-md" title="Record Meeting">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="12" cy="12" r="10" />
                                 <circle cx="12" cy="12" r="3" fill="currentColor" />
                             </svg>
                         </button>
-                        <button id="toggleChatBtn" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 p-3 rounded-full w-14 h-14 flex items-center justify-center transition active:scale-95 shadow-md relative" title="Toggle Chat Panel">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
-                            </svg>
-                            <span id="chatNotificationDot" class="absolute top-1 right-1 w-3 h-3 bg-indigo-500 rounded-full border-2 border-slate-800 hidden"></span>
-                        </button>
-                        <button id="leaveMeetingBtn" class="bg-red-600 hover:bg-red-500 border border-red-700/50 text-white p-3 rounded-full w-14 h-14 flex items-center justify-center transition active:scale-95 shadow-md" title="Leave Meeting">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 9c-2.2 0-4.3.4-6.2 1.1-.6.2-1 .7-1 1.3V14c0 .6.4 1 1 1h2.2c.5 0 .9-.4.9-1v-2.2c1-.3 2.1-.5 3.1-.5s2.1.2 3.1.5V13c0 .6.4 1 .9 1H21c.6 0 1-.4 1-1v-2.6c0-.6-.4-1.1-1-1.3C16.3 9.4 14.2 9 12 9z"/>
+                        <div style="position: relative; width: 56px; height: 56px; display: inline-block;">
+                            <button id="toggleChatBtn" class="bg-black hover:bg-zinc-900 border-2 border-zinc-700 text-white p-3 rounded-full w-full h-full flex items-center justify-center transition active:scale-95 shadow-md" title="Toggle Chat Panel">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+                                </svg>
+                            </button>
+                            <span id="chatNotificationDot" class="hidden" style="position: absolute; top: -5px; right: -5px; width: 22px; height: 22px; background-color: #0f172a; border: 2px solid #020617; border-radius: 50%; color: #ffffff; font-size: 10px; font-weight: bold; display: flex; align-items: center; justify-content: center; z-index: 30; pointer-events: none; line-height: 1; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);">0</span>
+                        </div>
+                        <button id="leaveMeetingBtn" class="bg-red-600 hover:bg-red-500 border-2 border-red-800 text-white p-3 rounded-full w-14 h-14 flex items-center justify-center transition active:scale-95 shadow-md" title="Leave Meeting">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" transform="rotate(135 12 12)" />
                             </svg>
                         </button>
                     </div>
@@ -185,6 +192,8 @@
     <input type="hidden" id="userName" value="{{ auth()->user()->name }}">
     <input type="hidden" id="csrfToken" value="{{ csrf_token() }}">
     <input type="hidden" id="isHost" value="{{ Auth::id() == $meeting->created_by ? '1' : '0' }}">
+    <input type="hidden" id="authAvatar" value="{{ auth()->user()->avatar }}">
+    <input type="hidden" id="initialPeerId" value="{{ $participant->peer_id ?? '' }}">
 
     <script src="https://unpkg.com/simple-peer@9.11.1/simplepeer.min.js"></script>
     <script>
@@ -209,9 +218,12 @@
         let localStream = null;
         let videoElements = {};
         let participantNames = {};
+        let participantAvatars = {};
+        let myAvatar = document.getElementById('authAvatar')?.value || '';
         let participantListState = [];
         let sidebarView = 'participants';
         let isEnded = false;
+        let unreadChatCount = 0;
         let refreshInterval = null;
         let myPeerId = null;
         let isConnecting = {};
@@ -229,13 +241,35 @@
         let recordingTimer = null;
         let recordingSeconds = 0;
         let recordingApprovedByHost = isHost;
+        let recordingRejectedByHost = false;
+        let recordingRequestTimer = null;
+        const originalRecordBtnHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <circle cx="12" cy="12" r="3" fill="currentColor" />
+            </svg>
+        `;
 
         function resetRecordButton() {
             const recordBtn = document.getElementById('recordBtn');
             if (!recordBtn) return;
 
-            recordBtn.disabled = false;
-            recordBtn.className = 'bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 p-3 rounded-full w-14 h-14 flex items-center justify-center transition active:scale-95 shadow-md';
+            if (recordingRejectedByHost) {
+                recordBtn.disabled = true;
+                recordBtn.innerHTML = 'Rejected';
+                recordBtn.className = 'bg-slate-800 border-2 border-slate-800 text-slate-500 p-3 rounded-full w-14 h-14 flex items-center justify-center cursor-not-allowed shadow-md';
+            } else {
+                recordBtn.disabled = false;
+                recordBtn.innerHTML = originalRecordBtnHTML;
+                recordBtn.className = 'bg-slate-800 hover:bg-slate-700 border-2 border-slate-800 text-slate-100 p-3 rounded-full w-14 h-14 flex items-center justify-center transition active:scale-95 shadow-md';
+            }
+        }
+
+        function clearRecordingRequestTimer() {
+            if (recordingRequestTimer) {
+                clearTimeout(recordingRequestTimer);
+                recordingRequestTimer = null;
+            }
         }
 
         // Hand raise state
@@ -299,8 +333,49 @@
             const panel = document.getElementById('chatPanel');
             const isChatVisible = panel && !panel.classList.contains('hidden') && sidebarView === 'chat';
             if (!isChatVisible) {
+                unreadChatCount++;
                 const dot = document.getElementById('chatNotificationDot');
-                if (dot) dot.classList.remove('hidden');
+                if (dot) {
+                    dot.textContent = unreadChatCount;
+                    dot.classList.remove('hidden');
+                }
+                updateSidebarButtonsUI();
+            }
+        }
+
+        function handleIncomingMediaStateChange(payload) {
+            const peerId = payload.peer_id;
+            const boxId = 'video-' + peerId;
+            const videoBox = document.getElementById(boxId);
+            if (videoBox) {
+                // Update mute badge
+                let badge = videoBox.querySelector('.mute-indicator');
+                if (payload.is_audio_muted) {
+                    if (!badge) {
+                        badge = document.createElement('span');
+                        badge.className = 'mute-indicator';
+                        badge.style.cssText = 'position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border-radius: 50%; background-color: #ffffff; border: 1.5px solid #d1d5db; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); z-index: 20;';
+                        badge.innerHTML = `
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2.5" xmlns="http://www.w3.org/2000/svg">
+                                <line x1="1" y1="1" x2="23" y2="23"></line>
+                                <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path>
+                                <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path>
+                                <line x1="12" y1="19" x2="12" y2="23"></line>
+                                <line x1="8" y1="23" x2="16" y2="23"></line>
+                            </svg>
+                        `;
+                        videoBox.appendChild(badge);
+                    }
+                } else if (badge) {
+                    badge.remove();
+                }
+
+                // Update avatar placeholder
+                updateAvatarPlaceholder(videoBox, {
+                    is_video_off: payload.is_video_off,
+                    user_name: participantNames[peerId] || 'User',
+                    user_avatar: participantAvatars[peerId]
+                });
             }
         }
 
@@ -319,6 +394,12 @@
                     raised: !!payload.raised,
                     userName: payload.user_name
                 });
+                return;
+            }
+
+            if (payload.type === 'media_state_changed') {
+                handleIncomingMediaStateChange(payload);
+                return;
             }
         }
 
@@ -374,12 +455,35 @@
 
             navigator.mediaDevices.getUserMedia({
                     audio: true,
-                    video: true
+                    video: {
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    }
                 })
                 .then(function(stream) {
                     localStream = stream;
+
+                    // Mute mic track initially
+                    const audioTrack = localStream.getAudioTracks()[0];
+                    if (audioTrack) {
+                        audioTrack.enabled = false;
+                    }
+
                     addVideo('local', stream, true);
                     console.log('Camera started successfully');
+
+                    // Sync initially muted state to server
+                    syncStatusToServer();
+
+                    // Dynamically push local stream to all active peer connections
+// Removed dynamic stream addition to peers; streams are now attached during peer connection creation.
+
+
+                    // Process any queued peer connection requests now that the stream is ready
+                    pendingPeerConnectionRequests.forEach(function(req) {
+                        createPeerConnection(req.peerId, req.isInitiator, req.customStream);
+                    });
+                    pendingPeerConnectionRequests = [];
                 })
                 .catch(function(err) {
                     console.error('Camera error:', err);
@@ -401,7 +505,8 @@
                         'X-CSRF-TOKEN': csrfToken
                     },
                     body: JSON.stringify({
-                        peer_id: myPeerId
+                        peer_id: myPeerId,
+                        meeting_id: meetingId
                     })
                 })
                 .then(function() {
@@ -428,18 +533,18 @@
         // PEER CONNECTION
         // ============================================================
         function createPeerConnection(peerId, isInitiator, customStream = null) {
-            if (!localStream) {
-                setTimeout(function() {
-                    createPeerConnection(peerId, isInitiator, customStream);
-                }, 500);
-                return;
-            }
             if (peers[peerId]) {
                 console.log('Already connected to:', peerId);
                 return;
             }
             if (isConnecting[peerId]) {
                 console.log('Already connecting to:', peerId);
+                return;
+            }
+            // If the local camera stream is not yet ready, queue the request
+            if (!localStream) {
+                console.log('Camera not ready – queuing connection for:', peerId);
+                pendingPeerConnectionRequests.push({peerId, isInitiator, customStream});
                 return;
             }
 
@@ -458,10 +563,22 @@
                 streamToSend = localStream; // standard camera connection
             }
 
+            const connectionTimeout = setTimeout(function() {
+                if (isConnecting[peerId] && (!peers[peerId] || !peers[peerId].connected)) {
+                    console.warn('Connection attempt timed out for:', peerId);
+                    isConnecting[peerId] = false;
+                    failedPeers[peerId] = Date.now();
+                    try {
+                        if (peers[peerId]) peers[peerId].destroy();
+                    } catch (e) {}
+                    delete peers[peerId];
+                }
+            }, 30000); // 30 seconds timeout for slower connections
+
             const peer = new SimplePeer({
                 initiator: isInitiator,
                 stream: streamToSend,
-                trickle: false,
+                trickle: true,
                 sdpTransform: sanitizeSDP,
                 config: {
                     iceServers: [{
@@ -500,6 +617,7 @@
             peer.on('stream', function(stream) {
                 console.log(' REMOTE STREAM RECEIVED from:', peerId);
                 delete failedPeers[peerId];
+                clearTimeout(connectionTimeout);
 
                 if (videoElements[peerId]) {
                     const videoEl = videoElements[peerId].querySelector('video');
@@ -518,6 +636,7 @@
             peer.on('connect', function() {
                 console.log(' Connected to:', peerId);
                 isConnecting[peerId] = false;
+                clearTimeout(connectionTimeout);
             });
 
             peer.on('data', function(data) {
@@ -532,6 +651,7 @@
 
             peer.on('close', function() {
                 console.log('Peer closed connection:', peerId);
+                clearTimeout(connectionTimeout);
                 removeVideo(peerId);
                 delete peers[peerId];
                 delete isConnecting[peerId];
@@ -539,6 +659,7 @@
 
             peer.on('error', function(err) {
                 console.error('Peer connection error:', err);
+                clearTimeout(connectionTimeout);
                 isConnecting[peerId] = false;
                 failedPeers[peerId] = Date.now();
                 try {
@@ -656,11 +777,9 @@
             }
 
             if (parsedSignal && parsedSignal.type === 'recording_permission_response') {
+                clearRecordingRequestTimer();
+
                 const recordBtn = document.getElementById('recordBtn');
-                if (recordBtn && !recordBtn.disabled) {
-                    return;
-                }
-                if (recordBtn) recordBtn.disabled = false;
 
                 if (parsedSignal.approved) {
                     recordingApprovedByHost = true;
@@ -669,8 +788,9 @@
                     startRecording();
                 } else {
                     recordingApprovedByHost = false;
+                    recordingRejectedByHost = true;
                     resetRecordButton();
-                    alert('Host rejected your recording request.');
+                    alert('Host rejected your recording request. You cannot request again.');
                 }
                 return;
             }
@@ -744,17 +864,22 @@
             // Store participant names
             data.forEach(function(p) {
                 if (p.user_id != authUserId) {
-                    participantNames[p.peer_id] = p.user_name;
-                    participantNames[p.peer_id + '_userId'] = p.user_id;
+                    if (p.peer_id) {
+                        participantNames[p.peer_id] = p.user_name;
+                        participantNames[p.peer_id + '_userId'] = p.user_id;
+                        participantAvatars[p.peer_id] = p.user_avatar;
+                    }
+                } else {
+                    myAvatar = p.user_avatar;
                 }
             });
 
             // Update mute/video status
             data.forEach(function(p) {
                 const isMe = (p.user_id == authUserId);
-                const boxId = isMe ?
-                    (myPeerId ? 'video-' + myPeerId : 'video-local') :
-                    'video-' + p.peer_id;
+                if (isMe) return; // Prevent overwriting local user's instant status updates
+
+                const boxId = 'video-' + p.peer_id;
                 const videoBox = document.getElementById(boxId);
 
                 if (videoBox) {
@@ -762,18 +887,24 @@
                     if (p.is_audio_muted) {
                         if (!badge) {
                             badge = document.createElement('span');
-                            badge.className = 'mute-indicator absolute top-3 right-3 bg-red-600/80 text-white px-2 py-0.5 rounded text-xs font-bold z-10';
-                            badge.textContent = ' MUTED';
+                            badge.className = 'mute-indicator';
+                            badge.style.cssText = 'position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border-radius: 50%; background-color: #ffffff; border: 1.5px solid #d1d5db; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); z-index: 20;';
+                            badge.innerHTML = `
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2.5" xmlns="http://www.w3.org/2000/svg">
+                                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                                    <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path>
+                                    <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path>
+                                    <line x1="12" y1="19" x2="12" y2="23"></line>
+                                    <line x1="8" y1="23" x2="16" y2="23"></line>
+                                </svg>
+                            `;
                             videoBox.appendChild(badge);
                         }
                     } else if (badge) {
                         badge.remove();
                     }
 
-                    const videoEl = videoBox.querySelector('video');
-                    if (videoEl) {
-                        videoEl.style.opacity = p.is_video_off ? '0.15' : '1';
-                    }
+                    updateAvatarPlaceholder(videoBox, p);
 
                     // Sync hand raised status for REMOTE and LOCAL users.
                     if (!isMe) {
@@ -800,9 +931,9 @@
                             const raiseHandBtn = document.getElementById('raiseHandBtn');
                             if (raiseHandBtn) {
                                 if (window.isHandRaised) {
-                                    raiseHandBtn.className = 'bg-indigo-600 text-white p-3 rounded-full shadow-lg w-14 h-14 flex items-center justify-center transition-colors';
+                                    raiseHandBtn.className = 'bg-indigo-600 text-white border-2 border-indigo-800 p-3 rounded-full shadow-lg w-14 h-14 flex items-center justify-center transition-colors';
                                 } else {
-                                    raiseHandBtn.className = 'bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 p-3 rounded-full w-14 h-14 flex items-center justify-center transition active:scale-95 shadow-md';
+                                    raiseHandBtn.className = 'bg-black hover:bg-zinc-900 border-2 border-zinc-700 text-white p-3 rounded-full w-14 h-14 flex items-center justify-center transition active:scale-95 shadow-md';
                                 }
                             }
                             globalRenderHandRaise(videoBox, window.isHandRaised);
@@ -832,9 +963,7 @@
 
                     if (shouldIInitiate) {
                         console.log('Outgoing connection to:', p.user_name);
-                        setTimeout(function() {
-                            createPeerConnection(p.peer_id, true);
-                        }, 100);
+                        createPeerConnection(p.peer_id, true);
                     } else {
                         console.log('Expecting incoming connection from:', p.user_name);
                     }
@@ -868,12 +997,35 @@
         // ============================================================
         // UNIFIED SYNC POLLING LOOPS
         // ============================================================
+        let currentSyncIntervalTime = 1000;
+
         function startSyncPolling() {
             if (syncInterval) clearInterval(syncInterval);
             runSync();
             syncInterval = setInterval(function() {
                 if (!isEnded) runSync();
-            }, 1000);
+            }, currentSyncIntervalTime);
+        }
+
+        function adjustPollingInterval() {
+            if (isEnded || !myPeerId) return;
+
+            const otherParticipants = participantListState.filter(p => p.user_id != authUserId && p.peer_id).length;
+            const connectedPeers = Object.keys(peers).filter(id => !id.endsWith('-screen')).length;
+
+            // If we have unconnected participants, poll very fast (200ms) to exchange signals instantly
+            // Otherwise, poll moderately (1000ms) to detect new joins faster while keeping server load low
+            const targetInterval = (connectedPeers < otherParticipants) ? 200 : 1000;
+
+            if (currentSyncIntervalTime !== targetInterval) {
+                currentSyncIntervalTime = targetInterval;
+                console.log('Adjusting sync polling interval to:', targetInterval, 'ms');
+                
+                if (syncInterval) clearInterval(syncInterval);
+                syncInterval = setInterval(function() {
+                    if (!isEnded) runSync();
+                }, targetInterval);
+            }
         }
 
         function runSync() {
@@ -919,6 +1071,9 @@
                     if (Array.isArray(data.messages)) {
                         data.messages.forEach(handleIncomingChatMessage);
                     }
+
+                    // Dynamically adjust polling frequency depending on connection status
+                    adjustPollingInterval();
                 })
                 .catch(err => {
                     isSyncing = false;
@@ -933,10 +1088,18 @@
             const isChatVisible = panel && !panel.classList.contains('hidden') && sidebarView === 'chat';
             if (isChatVisible) {
                 const dot = document.getElementById('chatNotificationDot');
-                if (dot) dot.classList.add('hidden');
-                chatBtn.className = 'bg-indigo-600 hover:bg-indigo-500 border border-indigo-700/50 text-white p-3 rounded-full w-14 h-14 flex items-center justify-center transition active:scale-95 shadow-md relative';
+                if (dot) {
+                    dot.classList.add('hidden');
+                    dot.textContent = '0';
+                }
+                unreadChatCount = 0;
+                chatBtn.className = 'bg-indigo-600 hover:bg-indigo-500 border-2 border-indigo-800 text-white p-3 rounded-full w-full h-full flex items-center justify-center transition active:scale-95 shadow-md';
             } else {
-                chatBtn.className = 'bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 p-3 rounded-full w-14 h-14 flex items-center justify-center transition active:scale-95 shadow-md relative';
+                if (unreadChatCount > 0) {
+                    chatBtn.className = 'bg-blue-600 hover:bg-blue-500 border-2 border-blue-800 text-white p-3 rounded-full w-full h-full flex items-center justify-center transition active:scale-95 shadow-md';
+                } else {
+                    chatBtn.className = 'bg-black hover:bg-zinc-900 border-2 border-zinc-700 text-white p-3 rounded-full w-full h-full flex items-center justify-center transition active:scale-95 shadow-md';
+                }
             }
         }
 
@@ -1176,6 +1339,66 @@
         }
 
         // ============================================================
+        // AVATAR PLACEHOLDER FOR CAMERA OFF STATE
+        // ============================================================
+        function updateAvatarPlaceholder(videoBox, p) {
+            if (!videoBox) return;
+
+            let placeholder = videoBox.querySelector('.avatar-placeholder');
+            const videoEl = videoBox.querySelector('video');
+
+            if (p.is_video_off) {
+                // Camera is OFF: hide video and display avatar/initials
+                if (videoEl) {
+                    videoEl.style.opacity = '0';
+                    videoEl.style.visibility = 'hidden';
+                }
+
+                if (!placeholder) {
+                    placeholder = document.createElement('div');
+                    placeholder.className = 'avatar-placeholder absolute inset-0 flex items-center justify-center bg-slate-950/90 z-10';
+
+                    const avatarContainer = document.createElement('div');
+                    avatarContainer.className = 'w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center shadow-lg border-2 border-indigo-800 bg-indigo-600 text-white font-bold select-none overflow-hidden';
+
+                    const avatarUrl = p.user_avatar;
+                    if (avatarUrl) {
+                        const img = document.createElement('img');
+                        img.src = avatarUrl;
+                        img.className = 'w-full h-full object-cover';
+                        img.alt = p.user_name || 'User';
+                        img.onerror = function() {
+                            // Fallback to initial if image loading fails
+                            avatarContainer.innerHTML = '';
+                            const span = document.createElement('span');
+                            span.className = 'text-3xl md:text-4xl font-semibold';
+                            span.textContent = (p.user_name || 'U').charAt(0).toUpperCase();
+                            avatarContainer.appendChild(span);
+                        };
+                        avatarContainer.appendChild(img);
+                    } else {
+                        const span = document.createElement('span');
+                        span.className = 'text-3xl md:text-4xl font-semibold';
+                        span.textContent = (p.user_name || 'U').charAt(0).toUpperCase();
+                        avatarContainer.appendChild(span);
+                    }
+
+                    placeholder.appendChild(avatarContainer);
+                    videoBox.appendChild(placeholder);
+                }
+            } else {
+                // Camera is ON: show video and remove placeholder
+                if (videoEl) {
+                    videoEl.style.opacity = '1';
+                    videoEl.style.visibility = 'visible';
+                }
+                if (placeholder) {
+                    placeholder.remove();
+                }
+            }
+        }
+
+        // ============================================================
         // VIDEO GRID RENDERER
         // ============================================================
         function addVideo(peerId, stream, isLocal) {
@@ -1201,6 +1424,15 @@
                         localContainer.addEventListener('click', function(e) {
                             toggleZoom(localContainer);
                         });
+
+                        // Set initial placeholder state for local user
+                        const videoTrack = stream.getVideoTracks()[0];
+                        const isVideoOff = videoTrack ? !videoTrack.enabled : true;
+                        updateAvatarPlaceholder(localContainer, {
+                            is_video_off: isVideoOff,
+                            user_name: myName,
+                            user_avatar: myAvatar
+                        });
                     }
 
                     const waiting = document.getElementById('waitingMessage');
@@ -1210,6 +1442,7 @@
             }
 
             const name = participantNames[peerId] || 'User';
+            const avatarUrl = participantAvatars[peerId] || null;
 
             const div = document.createElement('div');
             div.id = 'video-' + peerId;
@@ -1245,6 +1478,18 @@
 
             videoElements[peerId] = div;
 
+            // Set initial placeholder state for remote user if state is known
+            const pState = participantListState.find(p => p.peer_id === peerId);
+            if (pState) {
+                updateAvatarPlaceholder(div, pState);
+            } else {
+                updateAvatarPlaceholder(div, {
+                    is_video_off: false,
+                    user_name: name,
+                    user_avatar: avatarUrl
+                });
+            }
+
             // Apply visual hand-raised badge if already raised
             const key = peerId;
             const userId = participantNames[peerId + '_userId'];
@@ -1257,11 +1502,29 @@
             if (waiting && grid.children.length > 1) waiting.style.display = 'none';
 
             console.log('Added video for:', name);
+            
+            // Adjust layout for screenshare if needed
+            adjustScreenShareLayout();
+
+            // Recalculate dynamic polling interval
+            adjustPollingInterval();
         }
 
         function removeVideo(peerId) {
             if (videoElements[peerId]) {
                 const el = videoElements[peerId];
+
+                // If removing a screenshare box, restore the nested camera box first to avoid losing it
+                if (peerId.endsWith('-screen')) {
+                    const cameraBox = el.querySelector('[id^="video-"]:not([id$="-screen"])');
+                    if (cameraBox) {
+                        cameraBox.classList.remove('camera-pip-circle');
+                        const grid = document.getElementById('gridContainer');
+                        if (grid) grid.appendChild(cameraBox);
+                        console.log('Restored nested camera box before removing screenshare');
+                    }
+                }
+
                 if (currentlySpotlightedContainer === el) {
                     const grid = document.getElementById('gridContainer');
                     if (grid) {
@@ -1277,6 +1540,9 @@
                     el.remove();
                 }
                 delete videoElements[peerId];
+                
+                // Adjust layout for screenshare if needed
+                adjustScreenShareLayout();
             }
 
             if (peers[peerId]) {
@@ -1286,6 +1552,60 @@
                 delete peers[peerId];
             }
             delete isConnecting[peerId];
+
+            // Recalculate dynamic polling interval
+            adjustPollingInterval();
+        }
+
+        function adjustScreenShareLayout() {
+            const grid = document.getElementById('gridContainer');
+            if (!grid) return;
+
+            // Find any active screenshare container
+            const screenBox = Array.from(grid.querySelectorAll('[id$="-screen"]'))[0];
+
+            if (screenBox) {
+                // 1. Make the screenshare box spotlighted automatically
+                if (!screenBox.classList.contains('video-box-spotlight')) {
+                    if (currentlySpotlightedContainer && currentlySpotlightedContainer !== screenBox) {
+                        currentlySpotlightedContainer.classList.remove('video-box-spotlight');
+                    }
+                    screenBox.classList.add('video-box-spotlight');
+                    grid.classList.add('has-spotlight');
+                    currentlySpotlightedContainer = screenBox;
+                }
+
+                // 2. Find the owner's camera container
+                const screenId = screenBox.id; // e.g., "video-[parentPeerId]-screen"
+                const parentPeerId = screenId.replace('video-', '').replace('-screen', '');
+                let cameraBox = document.getElementById('video-' + parentPeerId);
+                
+                if (!cameraBox && parentPeerId === myPeerId) {
+                    cameraBox = document.getElementById('video-local');
+                }
+
+                if (cameraBox && cameraBox.parentElement !== screenBox) {
+                    // Move cameraBox inside screenBox
+                    screenBox.appendChild(cameraBox);
+                    cameraBox.classList.add('camera-pip-circle');
+                    console.log('Moved camera box', cameraBox.id, 'into PIP circle inside shared screen');
+                }
+            } else {
+                // Restore any PIP circle camera box back to the main grid
+                const pipBoxes = document.querySelectorAll('.camera-pip-circle');
+                pipBoxes.forEach(box => {
+                    box.classList.remove('camera-pip-circle');
+                    grid.appendChild(box);
+                    console.log('Restored camera box', box.id, 'to the grid container');
+                });
+
+                // If the screenshare spotlight was removed, clear spotlight state
+                if (currentlySpotlightedContainer && currentlySpotlightedContainer.id && currentlySpotlightedContainer.id.endsWith('-screen')) {
+                    currentlySpotlightedContainer.classList.remove('video-box-spotlight');
+                    grid.classList.remove('has-spotlight');
+                    currentlySpotlightedContainer = null;
+                }
+            }
         }
 
         // ============================================================
@@ -1406,6 +1726,37 @@
                     console.log('Hand raise received (whisper):', payload);
                     handleIncomingHandRaise(payload);
                 })
+                // MEDIA STATE CHANGED - Server Event (100% instant and reliable)
+                .listen('.media-state-changed', function(payload) {
+                    console.log('Media state changed server event received:', payload);
+                    handleIncomingMediaStateChange({
+                        peer_id: payload.peerId,
+                        user_id: payload.userId,
+                        is_audio_muted: payload.isAudioMuted,
+                        is_video_off: payload.isVideoOff
+                    });
+                })
+                // MEDIA STATE CHANGED - Client Whisper (fast fallback)
+                .listenForWhisper('media-state-changed', function(payload) {
+                    console.log('Media state changed whisper received:', payload);
+                    handleIncomingMediaStateChange(payload);
+                })
+                // PARTICIPANT READY - Client Whisper
+                .listenForWhisper('participant-ready', function(payload) {
+                    console.log('Participant ready whisper received:', payload);
+                    const pid = payload.peer_id;
+                    if (pid && pid !== myPeerId) {
+                        participantNames[pid] = payload.user_name || 'User';
+                        participantNames[pid + '_userId'] = payload.user_id;
+
+                        // Check if we should initiate the connection
+                        const shouldIInitiate = myPeerId > pid;
+                        if (shouldIInitiate && !peers[pid] && !isConnecting[pid]) {
+                            console.log('Outgoing connection to ready participant:', payload.user_name);
+                            createPeerConnection(pid, true);
+                        }
+                    }
+                })
                 // WEBRTC SIGNAL - Client Whisper (Instant sub-second connection)
                 .listenForWhisper('webrtc-signal', function(payload) {
                     if (payload.to_peer_id === myPeerId || payload.to_peer_id === myPeerId + '-screen') {
@@ -1424,11 +1775,9 @@
                 .listenForWhisper('recording-permission-response', function(payload) {
                     if (payload.targetPeerId === myPeerId || (payload.targetUserId && payload.targetUserId == authUserId)) {
                         console.log('WebSocket recording permission response:', payload);
+                        clearRecordingRequestTimer();
+
                         const recordBtn = document.getElementById('recordBtn');
-                        if (recordBtn && !recordBtn.disabled) {
-                            return;
-                        }
-                        if (recordBtn) recordBtn.disabled = false;
 
                         if (payload.approved) {
                             recordingApprovedByHost = true;
@@ -1437,8 +1786,9 @@
                             startRecording();
                         } else {
                             recordingApprovedByHost = false;
+                            recordingRejectedByHost = true;
                             resetRecordButton();
-                            alert('Host rejected your recording request.');
+                            alert('Host rejected your recording request. You cannot request again.');
                         }
                     }
                 })
@@ -1454,8 +1804,18 @@
 
                     if (p.peer_id) {
                         participantNames[p.peer_id] = p.user_name || 'User';
+                        participantNames[p.peer_id + '_userId'] = p.user_id;
+                        participantAvatars[p.peer_id] = p.user_avatar || null;
                         console.log('Participant stored:', p.user_name, 'Peer:', p.peer_id);
                     }
+
+                    // Clean up any old peer matching this user ID just in case
+                    Object.keys(peers).forEach(function(pid) {
+                        if (participantNames[pid + '_userId'] == p.user_id && pid !== p.peer_id) {
+                            console.log('Destroying old peer connection for rejoining user:', pid);
+                            removeVideo(pid);
+                        }
+                    });
 
                     runSync();
                 })
@@ -1485,6 +1845,14 @@
                         console.log('Skipping own leave event');
                         return;
                     }
+
+                    // Clean up leaving user's connections immediately
+                    Object.keys(peers).forEach(function(pid) {
+                        if (participantNames[pid + '_userId'] == data.user_id) {
+                            console.log('Cleaning up peer on user-left whisper:', pid);
+                            removeVideo(pid);
+                        }
+                    });
 
                     runSync();
                 });
@@ -1645,6 +2013,22 @@
             const isMuted = audioTrack ? !audioTrack.enabled : true;
             const isVideoOff = videoTrack ? !videoTrack.enabled : true;
 
+            const mediaPayload = {
+                type: 'media_state_changed',
+                peer_id: myPeerId,
+                user_id: authUserId,
+                is_audio_muted: isMuted,
+                is_video_off: isVideoOff
+            };
+
+            // 1. Broadcast media status changes instantly via direct WebRTC Data Channel
+            broadcastToConnectedPeers(mediaPayload);
+
+            // 2. Broadcast media status changes instantly via WebSocket whisper (fallback)
+            if (activeMeetingChannel && typeof activeMeetingChannel.whisper === 'function') {
+                activeMeetingChannel.whisper('media-state-changed', mediaPayload);
+            }
+
             fetch('/meeting/update-status/' + meetingId, {
                 method: 'POST',
                 headers: {
@@ -1672,13 +2056,39 @@
                 if (track.enabled) {
                     if (micOnIcon) micOnIcon.classList.remove('hidden');
                     if (micOffIcon) micOffIcon.classList.add('hidden');
-                    btn.className = 'bg-slate-850 text-white hover:bg-slate-800 p-3 rounded-full w-14 h-14 flex items-center justify-center transition-colors border border-slate-700/50';
+                    btn.className = 'bg-black hover:bg-zinc-900 border-2 border-zinc-700 text-white p-3 rounded-full w-14 h-14 flex items-center justify-center transition active:scale-95 shadow-md';
                 } else {
                     if (micOnIcon) micOnIcon.classList.add('hidden');
                     if (micOffIcon) micOffIcon.classList.remove('hidden');
-                    btn.className = 'bg-red-600 text-white hover:bg-red-700 p-3 rounded-full w-14 h-14 flex items-center justify-center transition-colors';
+                    btn.className = 'bg-black hover:bg-zinc-900 border-2 border-zinc-700 text-white p-3 rounded-full w-14 h-14 flex items-center justify-center transition active:scale-95 shadow-md';
                 }
                 syncStatusToServer();
+
+                // Immediate feedback for local mute badge
+                const boxId = myPeerId ? 'video-' + myPeerId : 'video-local';
+                const videoBox = document.getElementById(boxId);
+                if (videoBox) {
+                    let badge = videoBox.querySelector('.mute-indicator');
+                    if (!track.enabled) { // muted
+                        if (!badge) {
+                            badge = document.createElement('span');
+                            badge.className = 'mute-indicator';
+                            badge.style.cssText = 'position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border-radius: 50%; background-color: #ffffff; border: 1.5px solid #d1d5db; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); z-index: 20;';
+                            badge.innerHTML = `
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2.5" xmlns="http://www.w3.org/2000/svg">
+                                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                                    <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path>
+                                    <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path>
+                                    <line x1="12" y1="19" x2="12" y2="23"></line>
+                                    <line x1="8" y1="23" x2="16" y2="23"></line>
+                                </svg>
+                            `;
+                            videoBox.appendChild(badge);
+                        }
+                    } else if (badge) {
+                        badge.remove();
+                    }
+                }
             }
         }
 
@@ -1693,13 +2103,23 @@
                 if (track.enabled) {
                     if (camOnIcon) camOnIcon.classList.remove('hidden');
                     if (camOffIcon) camOffIcon.classList.add('hidden');
-                    btn.className = 'bg-slate-850 text-white hover:bg-slate-800 p-3 rounded-full w-14 h-14 flex items-center justify-center transition-colors border border-slate-700/50';
+                    btn.className = 'bg-black hover:bg-zinc-900 border-2 border-zinc-700 text-white p-3 rounded-full w-14 h-14 flex items-center justify-center transition-colors shadow-md';
                 } else {
                     if (camOnIcon) camOnIcon.classList.add('hidden');
                     if (camOffIcon) camOffIcon.classList.remove('hidden');
-                    btn.className = 'bg-red-600 text-white hover:bg-red-700 p-3 rounded-full w-14 h-14 flex items-center justify-center transition-colors';
+                    btn.className = 'bg-black hover:bg-zinc-900 border-2 border-zinc-700 text-white p-3 rounded-full w-14 h-14 flex items-center justify-center transition-colors shadow-md';
                 }
                 syncStatusToServer();
+
+                // Immediate feedback for local video box placeholder
+                const localBox = document.getElementById('localVideo')?.parentElement;
+                if (localBox) {
+                    updateAvatarPlaceholder(localBox, {
+                        is_video_off: !track.enabled,
+                        user_name: myName,
+                        user_avatar: myAvatar
+                    });
+                }
             }
         }
 
@@ -1746,7 +2166,7 @@
                     const screenTrack = screenStream.getVideoTracks()[0];
                     screenTrack.onended = () => stopScreenShare();
 
-                    screenBtn.className = 'bg-blue-600 hover:bg-blue-500 border border-blue-700/50 text-white p-3 rounded-full w-14 h-14 flex items-center justify-center transition active:scale-95 shadow-md';
+                    screenBtn.className = 'bg-blue-600 hover:bg-blue-500 border-2 border-blue-800 text-white p-3 rounded-full w-14 h-14 flex items-center justify-center transition active:scale-95 shadow-md';
                     isScreenSharing = true;
 
                 } catch (err) {
@@ -1778,7 +2198,7 @@
             });
 
             if (screenBtn) {
-                screenBtn.className = 'bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 p-3 rounded-full w-14 h-14 flex items-center justify-center transition active:scale-95 shadow-md';
+                screenBtn.className = 'bg-black hover:bg-zinc-900 border-2 border-zinc-700 text-white p-3 rounded-full w-14 h-14 flex items-center justify-center transition active:scale-95 shadow-md';
             }
             isScreenSharing = false;
         }
@@ -2031,6 +2451,11 @@
         }
 
         function requestRecordingPermission() {
+            if (recordingRejectedByHost) {
+                alert('Your previous recording request was rejected by the host. You cannot request again.');
+                return;
+            }
+
             const hostPeerId = getHostPeerId();
             if (!hostPeerId) {
                 alert('Host is not present in the meeting. Cannot request recording permission.');
@@ -2059,6 +2484,17 @@
 
             // 2. DB fallback
             sendSignal(hostPeerId, payload);
+
+            // Start 10s timer
+            clearRecordingRequestTimer();
+            recordingRequestTimer = setTimeout(() => {
+                console.log('Recording request timed out (no host response after 10s)');
+                recordingRequestTimer = null;
+                if (!isRecording && !recordingApprovedByHost && !recordingRejectedByHost) {
+                    resetRecordButton();
+                    alert('No response from host. You can try requesting again.');
+                }
+            }, 10000);
         }
 
         function playNotificationSound() {
@@ -2340,7 +2776,7 @@
 
                 const recordBtn = document.getElementById('recordBtn');
                 if (recordBtn) {
-                    recordBtn.className = 'bg-red-600 text-white hover:bg-red-700 p-3 rounded-full w-14 h-14 flex items-center justify-center transition active:scale-95 shadow-md animate-pulse';
+                    recordBtn.className = 'bg-red-600 text-white hover:bg-red-700 border-2 border-red-800 p-3 rounded-full w-14 h-14 flex items-center justify-center transition active:scale-95 shadow-md animate-pulse';
                 }
 
                 document.getElementById('recordingStatus').classList.remove('hidden');
@@ -2390,6 +2826,10 @@
         }
 
         function toggleRecording() {
+            if (recordingRejectedByHost) {
+                alert('Your previous recording request was rejected by the host. You cannot request again.');
+                return;
+            }
             if (isRecording) {
                 stopRecording();
             } else {
@@ -2488,9 +2928,9 @@
 
                 // Update UI immediately for self
                 if (window.isHandRaised) {
-                    raiseHandBtn.className = 'bg-indigo-600 text-white p-3 rounded-full shadow-lg w-14 h-14 flex items-center justify-center transition-colors';
+                    raiseHandBtn.className = 'bg-indigo-600 text-white border-2 border-indigo-800 p-3 rounded-full shadow-lg w-14 h-14 flex items-center justify-center transition-colors';
                 } else {
-                    raiseHandBtn.className = 'bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 p-3 rounded-full w-14 h-14 flex items-center justify-center transition active:scale-95 shadow-md';
+                    raiseHandBtn.className = 'bg-black hover:bg-zinc-900 border-2 border-zinc-700 text-white p-3 rounded-full w-14 h-14 flex items-center justify-center transition active:scale-95 shadow-md';
                 }
 
                 let localBox = document.getElementById('localVideo')?.parentElement;
@@ -2503,9 +2943,9 @@
                     console.warn('Peer ID not ready yet');
                     window.isHandRaised = !newRaisedState;
                     if (window.isHandRaised) {
-                        raiseHandBtn.className = 'bg-indigo-600 text-white p-3 rounded-full shadow-lg w-14 h-14 flex items-center justify-center transition-colors';
+                        raiseHandBtn.className = 'bg-indigo-600 text-white border-2 border-indigo-800 p-3 rounded-full shadow-lg w-14 h-14 flex items-center justify-center transition-colors';
                     } else {
-                        raiseHandBtn.className = 'bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 p-3 rounded-full w-14 h-14 flex items-center justify-center transition active:scale-95 shadow-md';
+                        raiseHandBtn.className = 'bg-black hover:bg-zinc-900 border-2 border-zinc-700 text-white p-3 rounded-full w-14 h-14 flex items-center justify-center transition active:scale-95 shadow-md';
                     }
                     const localBox = document.getElementById('localVideo')?.parentElement;
                     if (localBox) {
@@ -2557,10 +2997,96 @@
                 }
             });
 
-            // Start peer ID generation and camera
-            generatePeerId();
+            // Copy meeting link handler
+            document.getElementById('copyLinkBtn')?.addEventListener('click', function() {
+                const meetingLink = window.location.href;
+                navigator.clipboard.writeText(meetingLink).then(function() {
+                    showToastNotification('Meeting link copied to clipboard!');
+                }).catch(function(err) {
+                    console.error('Failed to copy link:', err);
+                    // Fallback copy method
+                    const tempInput = document.createElement('input');
+                    tempInput.value = meetingLink;
+                    document.body.appendChild(tempInput);
+                    tempInput.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(tempInput);
+                    showToastNotification('Meeting link copied to clipboard!');
+                });
+            });
+
+            function showToastNotification(message) {
+                const toast = document.createElement('div');
+                toast.textContent = message;
+                toast.style.cssText = `
+                    position: fixed;
+                    bottom: 24px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background-color: #0f172a; /* Slate 900 */
+                    border: 1px solid #1e293b; /* Slate 800 */
+                    color: #ffffff;
+                    padding: 10px 20px;
+                    border-radius: 12px;
+                    font-size: 14px;
+                    font-weight: 600;
+                    z-index: 100;
+                    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+                    pointer-events: none;
+                    animation: toast-anim 2.5s ease-in-out forwards;
+                `;
+                
+                if (!document.getElementById('toast-keyframes')) {
+                    const style = document.createElement('style');
+                    style.id = 'toast-keyframes';
+                    style.innerHTML = `
+                        @keyframes toast-anim {
+                            0% { transform: translate(-50%, 20px); opacity: 0; }
+                            15% { transform: translate(-50%, 0); opacity: 1; }
+                            85% { transform: translate(-50%, 0); opacity: 1; }
+                            100% { transform: translate(-50%, -20px); opacity: 0; }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+                
+                document.body.appendChild(toast);
+                setTimeout(() => {
+                    toast.remove();
+                }, 2500);
+            }
+
+            // Start camera and signaling registration in parallel for maximum connection speed
             startCamera();
+            generatePeerId();
         });
+
+        function leaveMeetingWithoutConfirm() {
+            if (window.Echo) {
+                const meetingChannel = getMeetingChannel();
+                if (meetingChannel && typeof meetingChannel.whisper === 'function') {
+                    meetingChannel.whisper('user-left', {
+                        user_id: authUserId,
+                        user_name: document.getElementById('userName')?.value || 'User'
+                    });
+                }
+            }
+
+            closeAll();
+            fetch('/meeting/leave', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                keepalive: true,
+                body: JSON.stringify({
+                    meeting_id: meetingId
+                })
+            }).catch(function(err) {
+                console.error('Leave meeting request failed:', err);
+            });
+        }
 
         // ============================================================
         // WINDOW EVENTS
@@ -2568,6 +3094,7 @@
         window.addEventListener('beforeunload', function() {
             if (syncInterval) clearInterval(syncInterval);
             if (isRecording) stopRecording();
+            leaveMeetingWithoutConfirm();
         });
     </script>
 
@@ -2636,6 +3163,34 @@
         #gridContainer.has-spotlight {
             align-items: start !important;
             grid-auto-rows: auto !important;
+        }
+
+        .camera-pip-circle {
+            position: absolute !important;
+            bottom: 16px !important;
+            right: 16px !important;
+            width: 120px !important;
+            height: 120px !important;
+            border-radius: 50% !important;
+            border: 3px solid #ffffff !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
+            z-index: 50 !important;
+            aspect-ratio: 1/1 !important;
+            overflow: hidden !important;
+            margin: 0 !important;
+            max-width: none !important;
+        }
+
+        .camera-pip-circle video {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            border-radius: 50% !important;
+        }
+
+        .camera-pip-circle > div,
+        .camera-pip-circle > span {
+            display: none !important;
         }
 
         .bg-slate-850 {

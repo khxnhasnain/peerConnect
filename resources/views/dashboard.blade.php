@@ -15,8 +15,8 @@
                 <div class="flex items-center gap-3">
                     <img src="/images/logo.png" class="h-14 object-contain" alt="Logo">
                     <div>
-                        <h1 class="text-2xl font-bold text-indigo-400">PeerConnect</h1>
-                        <p class="text-slate-400 text-[11px] font-medium mt-0.5 whitespace-nowrap">Video Meetings & Chat</p>
+                        <h1 class="text-2xl font-bold text-indigo-450">Global Connect</h1>
+                        <p class="text-slate-400 text-[11px] font-medium mt-0.5 whitespace-nowrap">Connect, Collaborate, and Conquer </p>
                     </div>
                 </div>
             </div>
@@ -55,29 +55,29 @@
 
                 <div id="headerRight" class="flex gap-2 items-center">
                     <div id="dashboardButtons" class="flex gap-2">
-                        <a href="{{ route('meeting.create') }}"
-                            class="h-10 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border border-indigo-700/50 text-white text-sm font-semibold flex items-center gap-2 transition active:scale-95 shadow-md">
+                        <button id="hostMeetingBtn"
+                            class="h-10 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border-2 border-indigo-800 text-white text-sm font-semibold flex items-center gap-2 transition active:scale-95 shadow-md">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                             </svg>
                             Host
-                        </a>
+                        </button>
                         <button id="joinMeetingBtn"
-                            class="h-10 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border border-indigo-700/50 text-white text-sm font-semibold flex items-center gap-2 transition active:scale-95 shadow-md">
+                            class="h-10 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border-2 border-indigo-800 text-white text-sm font-semibold flex items-center gap-2 transition active:scale-95 shadow-md">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                             </svg>
                             Join
                         </button>
                         <a href="{{ route('recordings.index') }}"
-                            class="h-10 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border border-indigo-700/50 text-white text-sm font-semibold flex items-center gap-2 transition active:scale-95 shadow-md">
+                            class="h-10 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border-2 border-indigo-800 text-white text-sm font-semibold flex items-center gap-2 transition active:scale-95 shadow-md">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                             </svg>
                             Recordings
                         </a>
                         <a id="settingsBtn" href="{{ route('profile.edit') }}"
-                            class="h-10 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border border-indigo-700/50 text-white text-sm font-semibold flex items-center gap-2 transition active:scale-95 shadow-md">
+                            class="h-10 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border-2 border-indigo-800 text-white text-sm font-semibold flex items-center gap-2 transition active:scale-95 shadow-md">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.591 1.06c1.527-.917 3.293.85 2.376 2.377a1.724 1.724 0 001.06 2.591c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.06 2.591c.917 1.527-.85 3.293-2.377 2.376a1.724 1.724 0 00-2.591 1.06c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.591-1.06c-1.527.917-3.293-.85-2.376-2.377a1.724 1.724 0 00-1.06-2.591c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.06-2.591c-.917-1.527.85-3.293 2.377-2.376.918.555 2.118.038 2.591-1.06z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -98,6 +98,26 @@
             </div>
 
             <div id="chatMessages" class="flex-1 overflow-y-auto p-6 bg-slate-950/60 shadow-inner">
+                <!-- Session Messages -->
+                @if(session('success'))
+                <div class="mb-6 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm flex items-center justify-between gap-2 alert-banner shadow-sm">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        {{ session('success') }}
+                    </span>
+                    <button type="button" onclick="this.closest('.alert-banner').remove()" class="text-emerald-400 hover:text-emerald-200 transition font-bold text-lg leading-none p-1">&times;</button>
+                </div>
+                @endif
+                @if(session('error'))
+                <div class="mb-6 p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm flex items-center justify-between gap-2 alert-banner shadow-sm">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        {{ session('error') }}
+                    </span>
+                    <button type="button" onclick="this.closest('.alert-banner').remove()" class="text-rose-400 hover:text-rose-200 transition font-bold text-lg leading-none p-1">&times;</button>
+                </div>
+                @endif
+
                 <div id="emptyState" class="text-center text-slate-400 mt-20">
 
                 </div>
@@ -123,12 +143,83 @@
                 </div>
                 <h3 class="text-xl font-bold text-white">Join a Meeting</h3>
             </div>
-            <p class="text-slate-400 text-sm mb-4">Enter the meeting code or paste the full link to join.</p>
-            <input type="text" id="meetingLinkInput" placeholder="Enter room code (e.g., ABC123)..."
+            <input type="text" id="meetingLinkInput" placeholder="Enter the meeting code or link"
                 class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 mb-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-600 shadow-sm">
             <div class="flex gap-3">
                 <button id="joinModalCancel" class="flex-1 px-4 py-2.5 rounded-xl border border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white transition">Cancel</button>
                 <button id="joinModalSubmit" class="flex-1 px-4 py-2.5 rounded-xl bg-indigo-600 text-white hover:bg-indigo-500 border border-indigo-700/50 shadow-md transition">Join</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Host Meeting Options Modal -->
+    <div id="hostMeetingModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full mx-4 p-8 shadow-2xl relative">
+            <button id="hostModalClose" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl font-bold transition-colors hover:scale-105 active:scale-95">&times;</button>
+            
+            <div id="hostModalInitialState">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-full bg-indigo-500/10 flex items-center justify-center border-2 border-indigo-800">
+                        <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white">Host a Meeting</h3>
+                </div>
+
+                <div class="flex flex-col gap-4">
+                    <!-- Option 1: Instant Meeting -->
+                    <button id="startInstantMeetingBtn" class="w-full h-11 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border-2 border-indigo-800 text-white text-sm font-semibold flex items-center justify-center gap-2 transition active:scale-95 shadow-md">
+                        Start Instant Meeting
+                    </button>
+
+                    <div class="flex items-center justify-center gap-4 my-3 select-none text-slate-500">
+                        <div class="h-[1px] bg-slate-800 flex-1"></div>
+                        <span class="text-sm font-bold uppercase">Or</span>
+                        <div class="h-[1px] bg-slate-800 flex-1"></div>
+                    </div>
+
+                    <!-- Option 2: Schedule Meeting -->
+                    <div class="space-y-3">
+                        <style>
+                            input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+                                filter: invert(0.8) hue-rotate(220deg);
+                                cursor: pointer;
+                            }
+                        </style>
+                        <input type="datetime-local" id="scheduleDateTime" class="w-full rounded-xl border-2 border-indigo-800 bg-slate-950 px-4 py-3 text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-600 shadow-sm mb-1 font-medium tracking-wide">
+                        <button id="scheduleForLaterBtn" class="w-full h-11 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border-2 border-indigo-800 text-white text-sm font-semibold flex items-center justify-center gap-2 transition active:scale-95 shadow-md">
+                            Schedule for Later
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Success State -->
+            <div id="hostModalSuccessState" class="hidden">
+                <div class="flex flex-col items-center text-center">
+                    <div class="flex items-center justify-center gap-2 mb-2">
+                        <h3 class="text-xl font-bold text-white">Meeting Scheduled</h3>
+                        <div class="w-6 h-6 rounded-full bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="text-sm text-slate-400 mb-6">Share this code with your participants</p>
+                    
+                    <div class="w-full bg-slate-950 border border-slate-850 p-4 rounded-xl mb-6 flex items-center justify-between gap-3">
+                        <span id="scheduledMeetingCode" class="font-mono text-lg font-bold text-indigo-400 select-all"></span>
+                        <button id="copyScheduledCodeBtn" class="h-8 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white transition active:scale-95 shadow-md">
+                            Copy
+                        </button>
+                    </div>
+
+                    <div class="flex w-full gap-3">
+                        <a id="joinScheduledLink" href="#" class="flex-1 text-center px-4 py-2.5 rounded-xl border-2 border-slate-950 text-slate-300 hover:bg-slate-800 transition">Waiting Room</a>
+                        <button id="hostSuccessCloseBtn" class="flex-1 px-4 py-2.5 rounded-xl border-2 border-slate-950 text-slate-300 hover:bg-slate-800 transition">Close</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -495,6 +586,142 @@
                 this.classList.add('hidden');
             }
         });
+
+        // ============================================================
+        // HOST MEETING MODAL HANDLERS
+        // ============================================================
+        const hostMeetingBtn = document.getElementById('hostMeetingBtn');
+        const hostMeetingModal = document.getElementById('hostMeetingModal');
+        const hostModalClose = document.getElementById('hostModalClose');
+        const hostModalInitialState = document.getElementById('hostModalInitialState');
+        const hostModalSuccessState = document.getElementById('hostModalSuccessState');
+        const startInstantMeetingBtn = document.getElementById('startInstantMeetingBtn');
+        const scheduleDateTime = document.getElementById('scheduleDateTime');
+        const scheduleForLaterBtn = document.getElementById('scheduleForLaterBtn');
+        const scheduledMeetingCode = document.getElementById('scheduledMeetingCode');
+        const copyScheduledCodeBtn = document.getElementById('copyScheduledCodeBtn');
+        const joinScheduledLink = document.getElementById('joinScheduledLink');
+        const hostSuccessCloseBtn = document.getElementById('hostSuccessCloseBtn');
+
+        if (hostMeetingBtn) {
+            hostMeetingBtn.addEventListener('click', function() {
+                hostMeetingModal.classList.remove('hidden');
+                hostModalInitialState.classList.remove('hidden');
+                hostModalSuccessState.classList.add('hidden');
+                scheduleDateTime.value = '';
+            });
+        }
+
+        const closeHostModal = function() {
+            hostMeetingModal.classList.add('hidden');
+        };
+
+        if (hostModalClose) hostModalClose.addEventListener('click', closeHostModal);
+        if (hostSuccessCloseBtn) hostSuccessCloseBtn.addEventListener('click', closeHostModal);
+        if (hostMeetingModal) {
+            hostMeetingModal.addEventListener('click', function(e) {
+                if (e.target === this) closeHostModal();
+            });
+        }
+
+        // Start Instant Meeting
+        if (startInstantMeetingBtn) {
+            startInstantMeetingBtn.addEventListener('click', async function() {
+                startInstantMeetingBtn.disabled = true;
+                startInstantMeetingBtn.textContent = 'Starting...';
+                try {
+                    const response = await fetch("{{ route('meeting.create') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        }
+                    });
+                    const data = await response.json();
+                    if (data.success && data.join_url) {
+                        window.location.href = data.join_url;
+                    } else {
+                        alert(data.error || 'Failed to start meeting.');
+                        startInstantMeetingBtn.disabled = false;
+                        startInstantMeetingBtn.textContent = 'Start Instant Meeting';
+                    }
+                } catch (error) {
+                    console.error('Instant meeting error:', error);
+                    alert('An error occurred.');
+                    startInstantMeetingBtn.disabled = false;
+                    startInstantMeetingBtn.textContent = 'Start Instant Meeting';
+                }
+            });
+        }
+
+        // Schedule Meeting for Later
+        if (scheduleForLaterBtn) {
+            scheduleForLaterBtn.addEventListener('click', async function() {
+                const dateTimeVal = scheduleDateTime.value;
+                if (!dateTimeVal) {
+                    alert('Please select a date and time.');
+                    return;
+                }
+
+                const selectedDate = new Date(dateTimeVal);
+                if (selectedDate <= new Date()) {
+                    alert('Please select a future date and time.');
+                    return;
+                }
+
+                scheduleForLaterBtn.disabled = true;
+                scheduleForLaterBtn.textContent = 'Scheduling...';
+
+                try {
+                    const response = await fetch("{{ route('meeting.create') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body: JSON.stringify({
+                            start_at: new Date(dateTimeVal).toISOString()
+                        })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        hostModalInitialState.classList.add('hidden');
+                        hostModalSuccessState.classList.remove('hidden');
+                        scheduledMeetingCode.textContent = data.room_id;
+                        joinScheduledLink.href = data.join_url;
+                    } else {
+                        alert(data.error || 'Failed to schedule meeting.');
+                    }
+                } catch (error) {
+                    console.error('Schedule meeting error:', error);
+                    alert('An error occurred.');
+                } finally {
+                    scheduleForLaterBtn.disabled = false;
+                    scheduleForLaterBtn.textContent = 'Schedule for Later';
+                }
+            });
+        }
+
+        // Copy scheduled code
+        if (copyScheduledCodeBtn) {
+            copyScheduledCodeBtn.addEventListener('click', function() {
+                const code = scheduledMeetingCode.textContent;
+                const fullUrl = window.location.origin + '/meeting/' + code;
+                navigator.clipboard.writeText(fullUrl).then(function() {
+                    const originalText = copyScheduledCodeBtn.textContent;
+                    copyScheduledCodeBtn.textContent = 'Copied!';
+                    copyScheduledCodeBtn.classList.remove('bg-indigo-600');
+                    copyScheduledCodeBtn.classList.add('bg-emerald-600');
+                    setTimeout(function() {
+                        copyScheduledCodeBtn.textContent = originalText;
+                        copyScheduledCodeBtn.classList.remove('bg-emerald-600');
+                        copyScheduledCodeBtn.classList.add('bg-indigo-600');
+                    }, 2000);
+                });
+            });
+        }
 
         // ============================================================
         // EVENT LISTENERS

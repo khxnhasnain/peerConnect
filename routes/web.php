@@ -57,7 +57,8 @@ Route::middleware('auth')->group(function () {
 
     // Cleaned & Grouped Video Meeting Architecture
     Route::prefix('meeting')->controller(MeetingController::class)->group(function () {
-        Route::get('/create', 'create')->name('meeting.create');
+        Route::post('/create', 'create')->name('meeting.create');
+        Route::get('/status/{roomId}', 'checkStatus')->name('meeting.status');
         Route::get('/participants/{meetingId}', 'getParticipants')->name('meeting.participants');
         Route::get('/chat/{meetingId}', 'getChatMessages')->name('meeting.chat.messages');
         Route::get('/signals/{meetingId}/{peerId}', 'getSignals')->name('meeting.get-signals');

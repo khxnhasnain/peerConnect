@@ -14,6 +14,7 @@ class Meeting extends Model
         'room_id',
         'created_by',
         'meeting_name',
+        'start_at',
     ];
 
     public function creator()
