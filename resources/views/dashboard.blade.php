@@ -169,7 +169,7 @@
 
                 <div class="flex flex-col gap-4">
                     <!-- Option 1: Instant Meeting -->
-                    <button id="startInstantMeetingBtn" class="w-full h-11 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border-2 border-indigo-800 text-white text-sm font-semibold flex items-center justify-center gap-2 transition active:scale-95 shadow-md">
+                    <button id="startInstantMeetingBtn" class="w-full h-12 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border-2 border-indigo-800 text-white text-base font-semibold flex items-center justify-center gap-2 transition active:scale-95 shadow-md">
                         Start Instant Meeting
                     </button>
 
@@ -187,8 +187,9 @@
                                 cursor: pointer;
                             }
                         </style>
-                        <input type="datetime-local" id="scheduleDateTime" class="w-full rounded-xl border-2 border-indigo-800 bg-slate-950 px-4 py-3 text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-600 shadow-sm mb-1 font-medium tracking-wide">
-                        <button id="scheduleForLaterBtn" class="w-full h-11 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border-2 border-indigo-800 text-white text-sm font-semibold flex items-center justify-center gap-2 transition active:scale-95 shadow-md">
+                        <input type="text" id="scheduleMeetingName" placeholder="Add Title  (Optional)" class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-600 shadow-sm mb-1 font-medium tracking-wide">
+                        <input type="datetime-local" id="scheduleDateTime" class="w-full rounded-xl border-2 border-indigo-800 bg-slate-950 px-4 py-3 text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-600 shadow-sm mb-1 font-medium tracking-wide" style="color-scheme: dark;">
+                        <button id="scheduleForLaterBtn" class="w-full h-12 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 border-2 border-indigo-800 text-white text-base font-semibold flex items-center justify-center gap-2 transition active:scale-95 shadow-md">
                             Schedule for Later
                         </button>
                     </div>
@@ -206,6 +207,7 @@
                             </svg>
                         </div>
                     </div>
+                    <div id="scheduledMeetingNameDisplay" class="hidden"></div>
                     <p class="text-sm text-slate-400 mb-6">Share this code with your participants</p>
                     
                     <div class="w-full bg-slate-950 border border-slate-850 p-4 rounded-xl mb-6 flex items-center justify-between gap-3">
@@ -596,6 +598,7 @@
         const hostModalInitialState = document.getElementById('hostModalInitialState');
         const hostModalSuccessState = document.getElementById('hostModalSuccessState');
         const startInstantMeetingBtn = document.getElementById('startInstantMeetingBtn');
+        const scheduleMeetingName = document.getElementById('scheduleMeetingName');
         const scheduleDateTime = document.getElementById('scheduleDateTime');
         const scheduleForLaterBtn = document.getElementById('scheduleForLaterBtn');
         const scheduledMeetingCode = document.getElementById('scheduledMeetingCode');
@@ -608,6 +611,7 @@
                 hostMeetingModal.classList.remove('hidden');
                 hostModalInitialState.classList.remove('hidden');
                 hostModalSuccessState.classList.add('hidden');
+                if (scheduleMeetingName) scheduleMeetingName.value = '';
                 scheduleDateTime.value = '';
             });
         }
@@ -623,6 +627,39 @@
                 if (e.target === this) closeHostModal();
             });
         }
+
+        function formatLocalMeetingDateTime(dateTimeStr) {
+            if (!dateTimeStr) return '';
+            
+            // Split the datetime-local string "YYYY-MM-DDTHH:MM"
+            const [datePart, timePart] = dateTimeStr.split('T');
+            if (!datePart || !timePart) return '';
+            
+            const [year, month, day] = datePart.split('-').map(Number);
+            const [hours, minutes] = timePart.split(':').map(Number);
+            
+            // Create Date object using local parameters (month is 0-indexed)
+            const date = new Date(year, month - 1, day, hours, minutes);
+            
+            // Get the English month name and weekday name
+            const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            
+            const weekdayName = weekdays[date.getDay()];
+            const monthName = months[date.getMonth()];
+            const dayNum = date.getDate();
+            
+            // Format start time
+            let startHours = date.getHours();
+            const startMinutes = String(date.getMinutes()).padStart(2, '0');
+            const startAmpm = startHours >= 12 ? 'pm' : 'am';
+            startHours = startHours % 12;
+            startHours = startHours ? startHours : 12;
+            
+            return `${weekdayName}, ${dayNum} ${monthName} · ${startHours}:${startMinutes}${startAmpm}`;
+        }
+
+
 
         // Start Instant Meeting
         if (startInstantMeetingBtn) {
@@ -682,7 +719,8 @@
                             'X-CSRF-TOKEN': csrfToken
                         },
                         body: JSON.stringify({
-                            start_at: new Date(dateTimeVal).toISOString()
+                            start_at: dateTimeVal,
+                            meeting_name: scheduleMeetingName ? scheduleMeetingName.value : ''
                         })
                     });
                     const data = await response.json();
@@ -691,6 +729,11 @@
                         hostModalSuccessState.classList.remove('hidden');
                         scheduledMeetingCode.textContent = data.room_id;
                         joinScheduledLink.href = data.join_url;
+                        hostModalSuccessState.dataset.rawDateTime = dateTimeVal;
+                        const nameDisplay = document.getElementById('scheduledMeetingNameDisplay');
+                        if (nameDisplay) {
+                            nameDisplay.textContent = data.meeting_name || ('Meeting ' + data.room_id);
+                        }
                     } else {
                         alert(data.error || 'Failed to schedule meeting.');
                     }
@@ -707,9 +750,15 @@
         // Copy scheduled code
         if (copyScheduledCodeBtn) {
             copyScheduledCodeBtn.addEventListener('click', function() {
+                const title = document.getElementById('scheduledMeetingNameDisplay').textContent;
                 const code = scheduledMeetingCode.textContent;
-                const fullUrl = window.location.origin + '/meeting/' + code;
-                navigator.clipboard.writeText(fullUrl).then(function() {
+                const fullUrl = joinScheduledLink.href || (window.location.origin + '/meeting/' + code);
+                const rawDateTime = hostModalSuccessState.dataset.rawDateTime || '';
+                const formattedDateTime = formatLocalMeetingDateTime(rawDateTime);
+                
+                const shareText = `${title}\n${formattedDateTime}\nVideo call link: ${fullUrl}`;
+                
+                navigator.clipboard.writeText(shareText).then(function() {
                     const originalText = copyScheduledCodeBtn.textContent;
                     copyScheduledCodeBtn.textContent = 'Copied!';
                     copyScheduledCodeBtn.classList.remove('bg-indigo-600');

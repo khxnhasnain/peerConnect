@@ -31,19 +31,31 @@ class MeetingController extends Controller
                 }
             }
 
+            $meetingName = $request->filled('meeting_name') ? $request->meeting_name : 'Meeting ' . $roomId;
+
             $meeting = Meeting::create([
                 'room_id'      => $roomId,
                 'created_by'   => Auth::id(),
-                'meeting_name' => 'Meeting ' . $roomId,
+                'meeting_name' => $meetingName,
                 'start_at'     => $startAt,
             ]);
 
             if ($startAt && $startAt->isFuture()) {
+                $weekday = $startAt->format('l');
+                $day = $startAt->format('j');
+                $month = $startAt->format('F');
+                $startTime = $startAt->format('g:i');
+                $startAmpm = strtolower($startAt->format('A'));
+                
+                $formattedDateTime = "{$weekday}, {$day} {$month} · {$startTime}{$startAmpm}";
+
                 return response()->json([
-                    'success'  => true,
-                    'room_id'  => $roomId,
-                    'start_at' => $startAt->format('M d, Y h:i A'),
-                    'join_url' => route('meeting.join', $roomId),
+                    'success'             => true,
+                    'room_id'             => $roomId,
+                    'meeting_name'        => $meeting->meeting_name,
+                    'start_at'            => $startAt->format('M d, Y h:i A'),
+                    'formatted_date_time' => $formattedDateTime,
+                    'join_url'            => route('meeting.join', $roomId),
                 ]);
             }
 

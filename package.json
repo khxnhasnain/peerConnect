@@ -6,7 +6,7 @@
         "build": "vite build",
         "dev": "vite",
         "serve:http": "php artisan serve --host=0.0.0.0 --port=8001",
-        "serve:proxy": "local-ssl-proxy --source 8443 --target 127.0.0.1:8001 --cert storage/certs/cert.pem --key storage/certs/cert-key.pem --hostname 192.168.1.41",
+        "serve:proxy": "local-ssl-proxy --source 8443 --target 127.0.0.1:8001 --cert storage/certs/cert.pem --key storage/certs/cert-key.pem --hostname 192.168.1.18",
         "serve:https": "concurrently -n http,https -c blue,green \"npm run serve:http\" \"npm run serve:proxy\""
     },
     "devDependencies": {

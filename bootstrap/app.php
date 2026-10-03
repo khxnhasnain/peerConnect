@@ -15,6 +15,13 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->trimStrings(except: [
             'signal.sdp',
         ]);
+
+        $middleware->redirectGuestsTo(function () {
+            if (request()->is('meeting/*') || str_contains(request()->url(), '/meeting/')) {
+                session(['intended_meeting_url' => request()->fullUrl()]);
+            }
+            return route('login');
+        });
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

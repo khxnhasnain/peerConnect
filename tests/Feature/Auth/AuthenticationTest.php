@@ -39,3 +39,20 @@ test('users can logout', function () {
     $this->assertGuest();
     $response->assertRedirect('/');
 });
+
+test('guest redirected from meeting room is redirected back to meeting after login', function () {
+    $response = $this->get('/meeting/abc-def-ghi');
+
+    $response->assertRedirect(route('login'));
+    $this->assertEquals(url('/meeting/abc-def-ghi'), session('intended_meeting_url'));
+
+    $user = User::factory()->create();
+
+    $loginResponse = $this->post('/login', [
+        'email' => $user->email,
+        'password' => 'password',
+    ]);
+
+    $this->assertAuthenticated();
+    $loginResponse->assertRedirect(url('/meeting/abc-def-ghi'));
+});

@@ -7,7 +7,6 @@ export default defineConfig({
         port: 5174,
         strictPort: false,
         hmr: {
-            host: 'localhost',
             port: 5174,
         },
     },

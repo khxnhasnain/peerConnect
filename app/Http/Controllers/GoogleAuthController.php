@@ -39,6 +39,12 @@ class GoogleAuthController extends Controller
             }
 
             Auth::login($user);
+
+            if (session()->has('intended_meeting_url')) {
+                $intendedUrl = session()->pull('intended_meeting_url');
+                return redirect()->to($intendedUrl);
+            }
+
             return redirect()->route('dashboard');
         } catch (\Exception $e) {
             Log::error('Google login error: ' . $e->getMessage());

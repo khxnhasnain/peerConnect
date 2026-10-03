@@ -16,6 +16,13 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): View
     {
+        if (session()->has('url.intended')) {
+            $intended = session()->get('url.intended');
+            if (str_contains($intended, '/meeting/')) {
+                session(['intended_meeting_url' => $intended]);
+            }
+        }
+
         return view('auth.login');
     }
 
@@ -27,6 +34,11 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
+
+        if ($request->session()->has('intended_meeting_url')) {
+            $intendedUrl = $request->session()->pull('intended_meeting_url');
+            return redirect()->to($intendedUrl);
+        }
 
         return redirect()->intended(route('dashboard', absolute: false));
     }
